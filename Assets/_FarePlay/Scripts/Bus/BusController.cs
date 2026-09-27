@@ -1,25 +1,38 @@
 using UnityEngine;
-
+ 
 namespace FarePlay
 {
     /// <summary>
-    /// LANE A. Arcade bus driving on a Rigidbody. Start from your Unit 1 PlayerController,
-    /// but drive the Rigidbody in FixedUpdate so obstacles block the bus, collisions fire,
-    /// and speed can be measured (bus stops need to know when you've stopped).
-    /// Issue: "Bus driving: throttle, brake/reverse, steering"
+    /// LANE A. Arcade bus driving on a Rigidbody.
+    ///   Up    = accelerate (or brake, if you're rolling backwards)
+    ///   Down  = brake, then reverse once stopped
+    ///   Left/Right = steer (only while moving, reversed when backing up, like a real vehicle)
+    ///
+    /// We set the Rigidbody's velocity ourselves every physics step instead of using forces:
+    /// the bus responds instantly and predictably, but walls and obstacles still block it,
+    /// and collisions still fire (BusCollisionPenalty needs that).
     /// </summary>
     [RequireComponent(typeof(Rigidbody))]
     public class BusController : MonoBehaviour
     {
         public static BusController Current { get; private set; }
 
-        [Header("Driving")]
-        [SerializeField] float maxSpeed = 15f;              // m/s
-        [SerializeField] float acceleration = 6f;           // m/s per second
-        [SerializeField] float brakeDeceleration = 12f;
-        [SerializeField] float coastDeceleration = 3f;      // no key pressed
+        [Header("Speed (m/s)")]
+        [SerializeField] float maxSpeed = 12f;
+        [SerializeField] float acceleration = 5f;
+        [SerializeField] float brakeDeceleration = 14f;
+        [Tooltip("How fast the bus slows down when no key is pressed.")]
+        [SerializeField] float coastDeceleration = 3f;
         [SerializeField] float maxReverseSpeed = 4f;
-        [SerializeField] float turnDegreesPerSecond = 60f;
+
+        [Header("Steering")]
+        [SerializeField] float turnDegreesPerSecond = 55f;
+        [Tooltip("Below this speed, steering is weaker, so the bus can't spin on the spot.")]
+        [SerializeField] float fullSteerSpeed = 5f;
+
+        [Header("Collisions")]
+        [Tooltip("If the bus suddenly loses more speed than this in one physics step, it hit something: match the real speed.")]
+        [SerializeField] float blockedSpeedLoss = 0.5f;
 
         /// <summary>Signed speed in m/s (positive = forward). StopZone reads this.</summary>
         public float CurrentSpeed { get; private set; }
@@ -34,40 +47,92 @@ namespace FarePlay
         public bool HasFuel { get; set; } = true;
 
         Rigidbody rb;
+        float throttleInput;
+        float steerInput;
 
         void Awake()
         {
             Current = this;
             rb = GetComponent<Rigidbody>();
+
+            // Settings that make a velocity-driven vehicle behave. Set here so nobody forgets them.
+            rb.interpolation = RigidbodyInterpolation.Interpolate;                 // smooth camera, no jitter
+            rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;  // no driving through thin walls
+            rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ; // can't tip over
         }
 
         void OnEnable()  { GameEvents.StateChanged += HandleStateChanged; }
         void OnDisable() { GameEvents.StateChanged -= HandleStateChanged; }
+
+        void Start()
+        {
+            // Sandbox testing: there's no GameManager in this scene, so let the bus drive anyway.
+            if (GameManager.Instance == null) InputEnabled = true;
+        }
 
         void HandleStateChanged(GameState state)
         {
             InputEnabled = state == GameState.Ready || state == GameState.Driving;
         }
 
-        void FixedUpdate()
+        void Update()
         {
-            // TODO: read input like Unit 1: Input.GetAxis("Vertical") and Input.GetAxis("Horizontal").
-            //       Treat both as 0 when !InputEnabled. Ignore throttle when !HasFuel.
-            // TODO: move CurrentSpeed toward its target with Mathf.MoveTowards:
-            //       throttle -> maxSpeed, brake while moving forward -> 0 (brakeDeceleration),
-            //       brake while stopped -> -maxReverseSpeed, no key -> 0 (coastDeceleration).
-            // TODO: steer only while moving, scaled by speed, so the bus can't spin in place:
-            //       float turn = steer * turnDegreesPerSecond * (CurrentSpeed / maxSpeed) * Time.fixedDeltaTime;
-            //       rb.MoveRotation(rb.rotation * Quaternion.Euler(0f, turn, 0f));
-            // TODO: apply speed but keep gravity (Unity 6 name shown; Unity 2022 uses rb.velocity):
-            //       Vector3 v = transform.forward * CurrentSpeed; v.y = rb.linearVelocity.y; rb.linearVelocity = v;
-            // Tip: on the Rigidbody, freeze rotation X and Z so the bus can't tip over.
+            // Read the keyboard every frame; apply it in FixedUpdate.
+            throttleInput = InputEnabled ? Input.GetAxisRaw("Vertical") : 0f;
+            steerInput    = InputEnabled ? Input.GetAxis("Horizontal")  : 0f;
         }
 
-        /// <summary>BusCollisionPenalty calls this so a crash actually slows the bus down.</summary>
+        void FixedUpdate()
+        {
+            float dt = Time.fixedDeltaTime;
+            Vector3 forward = rb.rotation * Vector3.forward;
+
+            // 1. Did we hit something? If the bus lost a lot of speed since last step, a collision
+            //    stopped it, so adopt the real speed (otherwise it would keep "pushing" into walls).
+            float actualSpeed = Vector3.Dot(rb.linearVelocity, forward);
+            if (Mathf.Abs(CurrentSpeed) - Mathf.Abs(actualSpeed) > blockedSpeedLoss)
+            {
+                CurrentSpeed = actualSpeed;
+            }
+
+            // 2. Throttle / brake / reverse. With an empty tank you can still brake.
+            float throttle = HasFuel ? throttleInput : Mathf.Min(throttleInput, 0f);
+            IsThrottling = throttle > 0.01f;
+
+            float target;
+            float rate;
+            if (throttle > 0.01f)
+            {
+                if (CurrentSpeed < -0.1f) { target = 0f; rate = brakeDeceleration; }          // rolling back: brake first
+                else                      { target = maxSpeed * throttle; rate = acceleration; }
+            }
+            else if (throttle < -0.01f)
+            {
+                if (CurrentSpeed > 0.1f)  { target = 0f; rate = brakeDeceleration; }          // brake...
+                else                      { target = maxReverseSpeed * throttle; rate = acceleration; } // ...then reverse
+            }
+            else
+            {
+                target = 0f; rate = coastDeceleration;                                        // no key: roll to a stop
+            }
+            CurrentSpeed = Mathf.MoveTowards(CurrentSpeed, target, rate * dt);
+
+            // 3. Steering. steerFactor goes 0 -> 1 as you speed up, and turns negative when reversing,
+            //    so backing up steers like a real vehicle.
+            float steerFactor = Mathf.Clamp(CurrentSpeed / fullSteerSpeed, -1f, 1f);
+            float turnRadiansPerSecond = steerInput * turnDegreesPerSecond * steerFactor * Mathf.Deg2Rad;
+            rb.angularVelocity = new Vector3(0f, turnRadiansPerSecond, 0f);
+
+            // 4. Move. Keep the vertical velocity so gravity still works.
+            Vector3 velocity = forward * CurrentSpeed;
+            velocity.y = rb.linearVelocity.y;
+            rb.linearVelocity = velocity;
+        }
+
+        /// <summary>BusCollisionPenalty calls this so a crash noticeably slows the bus.</summary>
         public void OnHitObstacle()
         {
-            // TODO: CurrentSpeed *= 0.3f; (tune it)
+            CurrentSpeed *= 0.3f;
         }
     }
 }
