@@ -31,13 +31,44 @@ namespace FarePlay
 
         void Update()
         {
-            // TODO: get BusController.Current and the bounds of its collider.
-            //   Not overlapping the zone at all -> Empty.
-            //   Fully inside = zone.bounds.Contains(busBounds.min) && zone.bounds.Contains(busBounds.max).
-            //   Fully inside AND Mathf.Abs(bus.CurrentSpeed) < tuning.stoppedSpeedThreshold -> StoppedInside,
-            //   otherwise -> PartlyInside.
-            // TODO: tint bayMarking.material.color: white = Empty,
-            //   yellow = PartlyInside (show "Pull fully into the bay"), green = StoppedInside.
+            BusController bus = BusController.Current;
+            if (bus == null)
+            {
+                Status = ZoneStatus.Empty;
+                ApplyBayTint();
+                return;
+            }
+
+            Bounds busBounds = bus.GetComponent<Collider>().bounds;
+            bool overlaps = zone.bounds.Intersects(busBounds);
+            bool fullyInside = IsFullyInsideOnPlane(zone.bounds, busBounds);
+
+            if (!overlaps)
+                Status = ZoneStatus.Empty;
+            else if (fullyInside && Mathf.Abs(bus.CurrentSpeed) < tuning.stoppedSpeedThreshold)
+                Status = ZoneStatus.StoppedInside;
+            else
+                Status = ZoneStatus.PartlyInside;
+
+            ApplyBayTint();
+        }
+
+        void ApplyBayTint()
+        {
+            if (bayMarking == null) return;
+
+            Color color = Status == ZoneStatus.StoppedInside ? Color.green
+                        : Status == ZoneStatus.PartlyInside  ? Color.yellow
+                        : Color.white;
+            bayMarking.material.color = color;
+        }
+
+        static bool IsFullyInsideOnPlane(Bounds zoneBounds, Bounds busBounds)
+        {
+            return busBounds.min.x >= zoneBounds.min.x
+                && busBounds.max.x <= zoneBounds.max.x
+                && busBounds.min.z >= zoneBounds.min.z
+                && busBounds.max.z <= zoneBounds.max.z;
         }
     }
 }

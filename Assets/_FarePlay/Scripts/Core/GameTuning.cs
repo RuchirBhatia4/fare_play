@@ -28,7 +28,7 @@ namespace FarePlay
         [Tooltip("The bus counts as stopped below this speed (m/s).")]
         public float stoppedSpeedThreshold = 0.5f;
         [Tooltip("One passenger boards every this many seconds.")]
-        public float secondsPerPassenger = 0.75f;
+        public float secondsPerPassenger = 1.5f;
         [Tooltip("0 = unlimited. (Stretch goal: capacity limit.)")]
         public int busCapacity = 0;
 
