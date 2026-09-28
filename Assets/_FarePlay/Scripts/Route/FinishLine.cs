@@ -1,17 +1,34 @@
 using UnityEngine;
-
+ 
 namespace FarePlay
 {
     /// <summary>
-    /// LANE B writes it, LANE A places it. A trigger across the finish. Both routes share it.
-    /// Issue: "Start lines, finish line and the 1:30 route timer"
+    /// A trigger across the finish. Both routes share it, so it doesn't need to be inside a Route.
+    /// Crossing it before a start line does nothing. Adding this component sizes its Box Collider automatically.
     /// </summary>
-    [RequireComponent(typeof(Collider))]
+    [RequireComponent(typeof(BoxCollider))]
     public class FinishLine : MonoBehaviour
     {
+        void Reset()
+        {
+            StartLine.ConfigureTrigger(GetComponent<BoxCollider>());
+        }
+ 
+        void Awake()
+        {
+            GetComponent<BoxCollider>().isTrigger = true;
+        }
+ 
         void OnTriggerEnter(Collider other)
         {
-            // TODO: if other belongs to the bus, call GameManager.Instance.FinishRun().
+            if (GameManager.Instance == null) return;
+            if (other.GetComponentInParent<BusController>() == null) return;
+            GameManager.Instance.FinishRun();
+        }
+ 
+        void OnDrawGizmos()
+        {
+            StartLine.DrawLineGizmo(transform, GetComponent<BoxCollider>(), new Color(1f, 0.3f, 0.3f, 0.35f));
         }
     }
 }
