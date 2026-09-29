@@ -78,7 +78,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7822359ef840d47949d6a41a779238fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FarePlay.ScoreManager
-  tuning: {fileID: 0}
+  tuning: {fileID: 11400000, guid: 69c2d1becd3794197b78893c819a94f0, type: 2}
 --- !u!1 &2801172264603590700
 GameObject:
   m_ObjectHideFlags: 0

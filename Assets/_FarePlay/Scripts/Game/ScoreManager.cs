@@ -20,8 +20,10 @@ namespace FarePlay
         {
             get
             {
-                // TODO: passengers x pointsPerPassenger - violations x redLightPenalty - collisions x collisionPenalty
-                return 0;
+                if (tuning == null) return 0;
+                return PassengersOnBoard * tuning.pointsPerPassenger
+                     - RedLightViolations * tuning.redLightPenalty
+                     - Collisions * tuning.collisionPenalty;
             }
         }
 
@@ -39,19 +41,50 @@ namespace FarePlay
             GameEvents.CollisionPenalty -= HandleCollision;
         }
 
-        void HandlePassengerBoarded() { /* TODO: PassengersOnBoard++ */ }
-        void HandleRedLight()         { /* TODO: RedLightViolations++ */ }
-        void HandleCollision()        { /* TODO: Collisions++ */ }
+        void HandlePassengerBoarded() { PassengersOnBoard++; }
+        void HandleRedLight()         { RedLightViolations++; }
+        void HandleCollision()        { Collisions++; }
 
         /// <summary>Called by GameManager when the run ends.</summary>
         public RunResult BuildResult(bool won, float secondsRemaining, string reason)
         {
-            // TODO: fill in every field of RunResult.
-            //  - Passengers only count as delivered when the bus reaches the finish (won == true).
-            //  - TimeBonus = Mathf.FloorToInt(secondsRemaining) x timeBonusPerSecond, only when won.
-            //  - Total = passenger points + time bonus - penalties, clamped at 0. When failed, Total = 0.
-            //  - RouteName from GameManager.Instance.ActiveRoute.DisplayName.
-            return new RunResult { Won = won, Reason = reason, SecondsRemaining = secondsRemaining };
+            int passengersDelivered = won ? PassengersOnBoard : 0;
+            int passengerPoints = won && tuning != null
+                ? passengersDelivered * tuning.pointsPerPassenger
+                : 0;
+            int redLightPoints = tuning != null
+                ? -RedLightViolations * tuning.redLightPenalty
+                : 0;
+            int collisionPoints = tuning != null
+                ? -Collisions * tuning.collisionPenalty
+                : 0;
+            int timeBonus = won && tuning != null
+                ? Mathf.FloorToInt(secondsRemaining) * tuning.timeBonusPerSecond
+                : 0;
+
+            int total = 0;
+            if (won)
+                total = Mathf.Max(0, passengerPoints + timeBonus + redLightPoints + collisionPoints);
+
+            string routeName = "";
+            if (GameManager.Instance != null && GameManager.Instance.ActiveRoute != null)
+                routeName = GameManager.Instance.ActiveRoute.DisplayName;
+
+            return new RunResult
+            {
+                Won = won,
+                Reason = reason,
+                RouteName = routeName,
+                PassengersDelivered = passengersDelivered,
+                PassengerPoints = passengerPoints,
+                RedLightViolations = RedLightViolations,
+                RedLightPoints = redLightPoints,
+                Collisions = Collisions,
+                CollisionPoints = collisionPoints,
+                SecondsRemaining = secondsRemaining,
+                TimeBonus = timeBonus,
+                Total = total,
+            };
         }
     }
 }
