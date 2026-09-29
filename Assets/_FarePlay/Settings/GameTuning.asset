@@ -19,7 +19,7 @@ MonoBehaviour:
   collisionCooldownSeconds: 1
   overviewSeconds: 30
   stoppedSpeedThreshold: 0.5
-  secondsPerPassenger: 0.75
+  secondsPerPassenger: 1.5
   busCapacity: 0
   fuelTankSize: 100
   fuelPerSecondAtFullThrottle: 4

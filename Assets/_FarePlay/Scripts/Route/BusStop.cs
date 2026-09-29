@@ -27,12 +27,26 @@ namespace FarePlay
 
         void Update()
         {
-            // TODO: while zone.BusStoppedInside && GameManager.Instance.State == GameState.Driving
-            //       && WaitingCount > 0 (&& capacity not reached, stretch):
-            //         boardTimer += Time.deltaTime;
-            //         every tuning.secondsPerPassenger: hide one passenger (SetActive(false)),
-            //         remove it from the list, GameEvents.RaisePassengerBoarded().
-            // TODO: otherwise reset boardTimer to 0.
+            bool canBoard = zone.BusStoppedInside
+                && WaitingCount > 0
+                && (GameManager.Instance == null || GameManager.Instance.State == GameState.Driving);
+
+            if (!canBoard)
+            {
+                boardTimer = 0f;
+                return;
+            }
+
+            boardTimer += Time.deltaTime;
+            if (boardTimer < tuning.secondsPerPassenger) return;
+
+            boardTimer = 0f;
+
+            GameObject passenger = waitingPassengers[waitingPassengers.Count - 1];
+            waitingPassengers.RemoveAt(waitingPassengers.Count - 1);
+            if (passenger != null) passenger.SetActive(false);
+
+            GameEvents.RaisePassengerBoarded();
         }
     }
 }
