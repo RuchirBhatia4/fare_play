@@ -72,9 +72,8 @@ namespace FarePlay
                 case GameState.Ready:
                     return "<size=55%>Drive through a start line to begin</size>";
                 case GameState.Won:
-                    return "Route complete!\n<size=55%>Press R to restart</size>";
                 case GameState.Failed:
-                    return $"{gm.LastResult.Reason}\n<size=55%>Press R to restart</size>";
+                    return "";
                 default:
                     return "";
             }
