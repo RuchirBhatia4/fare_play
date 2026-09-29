@@ -23,15 +23,26 @@ namespace FarePlay
 
         void Show(RunResult result)
         {
-            // TODO: panel.SetActive(true);
-            // TODO: titleText.text = result.Won ? "Route complete!" : result.Reason;
-            // TODO: breakdownText, one line each:
-            //       Passengers  8 x 100      +800
-            //       Red lights  1            -50
-            //       Collisions  2            -50
-            //       Time bonus  12 s x 10    +120
-            //       TOTAL                    820
-            // Restart button: OnClick -> GameManager.Restart (drag the GameSystems object in).
+            if (panel != null) panel.SetActive(true);
+
+            if (titleText != null)
+                titleText.text = result.Won ? "Route complete!" : result.Reason;
+
+            if (breakdownText == null) return;
+
+            GameTuning tuning = GameManager.Instance != null ? GameManager.Instance.Tuning : null;
+            int perPassenger = tuning != null ? tuning.pointsPerPassenger : 100;
+            int perSecond = tuning != null ? tuning.timeBonusPerSecond : 10;
+            int seconds = Mathf.FloorToInt(result.SecondsRemaining);
+
+            breakdownText.text =
+                $"Passengers  {result.PassengersDelivered} x {perPassenger}      {Signed(result.PassengerPoints)}\n" +
+                $"Red lights  {result.RedLightViolations}            {Signed(result.RedLightPoints)}\n" +
+                $"Collisions  {result.Collisions}            {Signed(result.CollisionPoints)}\n" +
+                $"Time bonus  {seconds} s x {perSecond}    {Signed(result.TimeBonus)}\n" +
+                $"TOTAL                    {result.Total}";
         }
+
+        static string Signed(int value) => value > 0 ? $"+{value}" : value.ToString();
     }
 }
