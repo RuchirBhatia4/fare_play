@@ -23,12 +23,18 @@ namespace FarePlay
 
         void OnCollisionEnter(Collision collision)
         {
-            // TODO: if collision.gameObject.CompareTag("Obstacle")
-            //       and GameManager.Instance.State == GameState.Driving
-            //       and Time.time - lastPenaltyTime >= tuning.collisionCooldownSeconds:
-            //           lastPenaltyTime = Time.time;
-            //           bus.OnHitObstacle();
-            //           GameEvents.RaiseCollisionPenalty();
+            if (!collision.gameObject.CompareTag("Obstacle")) return;
+
+            // Sandbox testing: no GameManager means we're always "driving".
+            bool driving = GameManager.Instance == null || GameManager.Instance.State == GameState.Driving;
+            if (!driving) return;
+
+            if (Time.time - lastPenaltyTime < tuning.collisionCooldownSeconds) return;
+
+            lastPenaltyTime = Time.time;
+            bus.OnHitObstacle();
+            GameEvents.RaiseCollisionPenalty();
+            Debug.Log($"Collision penalty: hit {collision.gameObject.name}");
         }
     }
 }

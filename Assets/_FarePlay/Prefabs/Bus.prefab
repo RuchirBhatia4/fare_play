@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7163662587421495129}
   - component: {fileID: 8131857784991330633}
   - component: {fileID: 2176644378460148575}
+  - component: {fileID: 2809104858663229374}
   m_Layer: 0
   m_Name: Bus
   m_TagString: Untagged
@@ -103,6 +104,19 @@ MonoBehaviour:
   turnDegreesPerSecond: 55
   fullSteerSpeed: 5
   blockedSpeedLoss: 0.5
+--- !u!114 &2809104858663229374
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2152239298649179729}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60f3bfc4480f744c98510cb8f1763038, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FarePlay.BusCollisionPenalty
+  tuning: {fileID: 11400000, guid: 69c2d1becd3794197b78893c819a94f0, type: 2}
 --- !u!1001 &4634808817041686526
 PrefabInstance:
   m_ObjectHideFlags: 0
