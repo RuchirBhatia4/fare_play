@@ -13,7 +13,7 @@ Handoff from the planning sessions (Sep 25–28, 2026). Shared by both teammates
 ## Game design (current, replaces the original proposal PDF in Docs/)
 1. **Overview:** top-down view of the route(s) for 30 s, bus locked. Space skips.
 2. **Chase camera** swoops in behind the bus; the player drives with arrow keys.
-3. **Timer 1:30** starts when the bus crosses either route's start line. At 0:00 the run fails (score 0).
+3. **Route timer** (per route, `Route.timeLimitSeconds`; Route 1 = 1:50 because it is ~665 m) starts when the bus crosses either route's start line. At 0:00 the run fails (score 0).
 4. **Bus stops:** passengers board one at a time (design: 0.75 s each; `GameTuning.asset` currently has 1.5 s, confirm with Yuyang) only when the WHOLE bus is inside the bay AND stopped (< 0.5 m/s). Driving away early leaves the rest.
 5. **Traffic lights:** green 8 s / yellow 2 s / red 8 s. Crossing the stop line on red = penalty (once per light). Running a red is allowed. The HUD always shows the NEXT light's state + countdown so players can board passengers during a red (a bus stop sits just before each light).
 6. **Collisions** with anything tagged `Obstacle` = penalty (1 s cooldown).
@@ -27,36 +27,36 @@ Handoff from the planning sessions (Sep 25–28, 2026). Shared by both teammates
 - **`Core/GameEvents.cs` is the contract between lanes**: static events `StateChanged, RunStarted, PassengerBoarded, RedLightViolation, CollisionPenalty, RunEnded`. Subscribe in `OnEnable`, unsubscribe in `OnDisable`.
 - `GameState`: Overview -> Ready -> Driving -> Won / Failed. `GameManager.Instance` owns it.
 - `GameTuning` (ScriptableObject, `Assets/_FarePlay/Settings/GameTuning.asset`) holds every balancing number.
-- `Route` (on each route root): name, time limit (90 s), `lightsInOrder`, `NextLight`, `MarkLightPassed`.
+- `Route` (on each route root): name, time limit (Route 1: 110 s), `lightsInOrder`, `NextLight`, `MarkLightPassed`.
 - Prefabs in `Assets/_FarePlay/Prefabs/`: `Bus.prefab` (root has Rigidbody mass 3000 + BoxCollider + BusController; model is a child), `GameSystems.prefab` (GameManager + RaceTimer + ScoreManager + Canvas with HUD + EventSystem), `BusStop.prefab` (StopZone + BusStop + bay marking + waiting passengers).
-- Scenes in `Assets/_FarePlay/Scenes/`: `Main.unity` (Ruchir only), `Sandbox_A` (Ruchir), `Sandbox_B` (Yuyang; has a test route, start/finish lines, Bus, GameSystems and a BusStop).
+- Scenes in `Assets/_FarePlay/Scenes/`: `Main.unity` (Ruchir only; the only scene in Build Settings), `Sandbox_A` (Ruchir), `Sandbox_B` (Yuyang; has a test route, start/finish lines, Bus, GameSystems and a BusStop).
 - Unity 6 APIs: `rb.linearVelocity` (not `velocity`). Active Input Handling = Both; scripts use `Input.GetAxis/GetKeyDown`.
 - `StopZone` checks "whole bus inside" with axis-aligned bounds: keep bays aligned to world X/Z and ~1–2 m larger than the bus.
 
-### Script status (as of Sep 28 night)
-- **Implemented:** BusController, CameraDirector, GameManager, RaceTimer, StartLine/FinishLine, HUD (timer, centre message, score, passengers, route name, signal indicator; all slots optional), Route, GameEvents, GameState, RunResult, GameTuning, StopZone + BusStop (#10, Yuyang), BusCollisionPenalty (#7, code written, awaiting Unity test on `feature/7-collision-penalty`).
-- **Still skeletons with TODOs:** ScoreManager, TrafficLight, TrafficStopLine, ResultsScreen.
+### Script status (as of Sep 29)
+- **Implemented:** BusController, CameraDirector, GameManager, RaceTimer, StartLine/FinishLine, HUD (timer, centre message, score, passengers, route name, signal indicator; all slots optional), Route, GameEvents, GameState, RunResult, GameTuning, StopZone + BusStop (#10, Yuyang), BusCollisionPenalty (#7), ScoreManager (#11), ResultsScreen (#17).
+- **Still skeletons with TODOs:** TrafficLight, TrafficStopLine (#13).
 
 ## GitHub issues (verify with `gh issue list --state all`)
-| # | Issue | Owner | Status (Sep 28 night) |
+| # | Issue | Owner | Status (Sep 29) |
 |---|---|---|---|
 | 1 | Set up the Unity project + Course Library | Ruchir | ✅ closed |
 | 2 | Teammate: clone, open, press Play | Yuyang | ✅ closed |
 | 3 | Bus driving | A | ✅ done |
 | 4 | Chase camera | A | ✅ done |
 | 5 | Overview camera 30 s -> chase switch (needs an OverviewPose object in Main) | A | Mon |
-| 6 | Route 1 blockout in Main.unity | A | Mon, next |
-| 7 | Collision penalty (BusCollisionPenalty) | A | code done, test + PR |
+| 6 | Route 1 blockout in Main.unity | A | in PR: ~665 m staircase, walls, 3 stops, 11 obstacles |
+| 7 | Collision penalty (BusCollisionPenalty) | A | ✅ done (PR #34) |
 | 8 | Game flow | B (done by Ruchir) | ✅ done |
 | 9 | Start lines, finish line, 1:30 timer | B (done by Ruchir) | ✅ done |
 | 10 | Bus stops (StopZone + BusStop.prefab) | B | ✅ done (PR #30) |
-| 11 | Scoring (ScoreManager.BuildResult, LiveScore) | B | Mon |
-| 12 | HUD v1: timer ✅, score + passengers texts still to add | B | Mon |
+| 11 | Scoring (ScoreManager.BuildResult, LiveScore) | B | ✅ done (PR #31) |
+| 12 | HUD v1: timer, score, passengers | B | ✅ done (PR #33) |
 | 13 | Traffic lights: cycle, stop line, red-light violations | A | Tue |
 | 14 | Bus stop right before each light | A | Tue |
 | 15 | Route 2 | A | Wed (should) |
-| 16 | HUD signal indicator (code done; UI objects only) | B | Tue |
-| 17 | Results screen + Restart button | B | Tue |
+| 16 | HUD signal indicator | B | ✅ done (PR #35) |
+| 17 | Results screen + Restart button | B | ✅ done (PR #36) |
 | 18 | Overview instructions + Space skip | B (done by Ruchir) | ✅ done |
 | 19 | First WebGL build at a public URL | B | Wed |
 | 20 | Playtest + balance | both | Wed-Thu |
@@ -69,8 +69,8 @@ Handoff from the planning sessions (Sep 25–28, 2026). Shared by both teammates
 | 27 | Sounds (stretch) | both | if ahead |
 
 ## Schedule
-- **Mon 9/28 (First playable):** A: #6 -> #7 -> #5. B: #10 ✅ -> #11 -> #12. Evening: full Route 1 run in Main with passengers + score.
-- **Tue 9/29:** A: #13, #14 (merge TrafficLight.prefab by midday). B: #16, #17. All musts on Route 1.
+- **Mon 9/28 (First playable):** A: #6 -> #7 ✅ -> #5. B: #10 ✅ -> #11 ✅ -> #12 ✅. Evening: full Route 1 run in Main with passengers + score.
+- **Tue 9/29:** A: #13, #14 (merge TrafficLight.prefab by midday). B: #16 ✅, #17 ✅. All musts on Route 1.
 - **Wed 9/30:** A: #15 or polish. B: #19 web build online, #20 playtest. Decide on stretch.
 - **Thu 10/1:** #20 balance, #21 bugs, stretch only if clean; #22 freeze 6 PM, final build.
 - **Fri 10/2:** #23 submit before 1 PM.
