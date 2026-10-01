@@ -13,9 +13,9 @@ Handoff from the planning sessions (Sep 25–28, 2026). Shared by both teammates
 ## Game design (current, replaces the original proposal PDF in Docs/)
 1. **Overview:** top-down view of the route(s) for 30 s, bus locked. Space skips.
 2. **Chase camera** swoops in behind the bus; the player drives with arrow keys.
-3. **Route timer** (per route, `Route.timeLimitSeconds`; Route 1 = 1:50 because it is ~665 m) starts when the bus crosses either route's start line. At 0:00 the run fails (score 0).
+3. **Route timer** (per route, `Route.timeLimitSeconds`; Route 1 = 1:30, deliberately tight: a perfect run takes ~81 s before red-light waits) starts when the bus crosses either route's start line. At 0:00 the run fails (score 0).
 4. **Bus stops:** passengers board one at a time (design: 0.75 s each; `GameTuning.asset` currently has 1.5 s, confirm with Yuyang) only when the WHOLE bus is inside the bay AND stopped (< 0.5 m/s). Driving away early leaves the rest.
-5. **Traffic lights:** green 8 s / yellow 2 s / red 8 s. Crossing the stop line on red = penalty (once per light). Running a red is allowed. The HUD always shows the NEXT light's state + countdown so players can board passengers during a red (a bus stop sits just before each light).
+5. **Traffic lights:** green 5 s / yellow 2 s / red 10 s (set on TrafficLight.prefab). Long reds make "wait and board vs run it for -50" a real choice. Crossing the stop line on red = penalty (once per light). Running a red is allowed. The HUD always shows the NEXT light's state + countdown so players can board passengers during a red (a bus stop sits just before each light).
 6. **Collisions** with anything tagged `Obstacle` = penalty (1 s cooldown).
 7. **Finish:** delivered passengers count; time bonus = seconds left x 10.
 8. **Scoring:** +100 per passenger delivered, -50 per red light, -25 per hit, +10 x seconds left. Total never below 0. Failed run = 0. All values live in `GameTuning.asset`.
@@ -27,7 +27,7 @@ Handoff from the planning sessions (Sep 25–28, 2026). Shared by both teammates
 - **`Core/GameEvents.cs` is the contract between lanes**: static events `StateChanged, RunStarted, PassengerBoarded, RedLightViolation, CollisionPenalty, RunEnded`. Subscribe in `OnEnable`, unsubscribe in `OnDisable`.
 - `GameState`: Overview -> Ready -> Driving -> Won / Failed. `GameManager.Instance` owns it.
 - `GameTuning` (ScriptableObject, `Assets/_FarePlay/Settings/GameTuning.asset`) holds every balancing number.
-- `Route` (on each route root): name, time limit (Route 1: 110 s), `lightsInOrder`, `NextLight`, `MarkLightPassed`.
+- `Route` (on each route root): name, time limit (Route 1: 90 s), `lightsInOrder`, `NextLight`, `MarkLightPassed`.
 - Prefabs in `Assets/_FarePlay/Prefabs/`: `Bus.prefab` (root has Rigidbody mass 3000 + BoxCollider + BusController; model is a child), `GameSystems.prefab` (GameManager + RaceTimer + ScoreManager + Canvas with HUD + EventSystem), `BusStop.prefab` (StopZone + BusStop + bay marking + waiting passengers).
 - Scenes in `Assets/_FarePlay/Scenes/`: `Main.unity` (Ruchir only; the only scene in Build Settings), `Sandbox_A` (Ruchir), `Sandbox_B` (Yuyang; has a test route, start/finish lines, Bus, GameSystems and a BusStop).
 - Unity 6 APIs: `rb.linearVelocity` (not `velocity`). Active Input Handling = Both; scripts use `Input.GetAxis/GetKeyDown`.

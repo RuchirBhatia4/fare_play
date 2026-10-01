@@ -46,9 +46,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 533dce879e50a4be7b1324dc010eaa53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FarePlay.TrafficLight
-  greenSeconds: 8
+  greenSeconds: 5
   yellowSeconds: 2
-  redSeconds: 8
+  redSeconds: 10
   startOffsetSeconds: 0
   greenLamp: {fileID: 3487780619479313418}
   yellowLamp: {fileID: 9023216045742920064}

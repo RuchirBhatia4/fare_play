@@ -12,9 +12,9 @@ namespace FarePlay
     /// </summary>
     public class TrafficLight : MonoBehaviour
     {
-        [SerializeField] float greenSeconds = 8f;
+        [SerializeField] float greenSeconds = 5f;
         [SerializeField] float yellowSeconds = 2f;
-        [SerializeField] float redSeconds = 8f;
+        [SerializeField] float redSeconds = 10f;
         [Tooltip("Seconds already into the cycle at start. Different offsets keep lights on the same route out of sync.")]
         [SerializeField] float startOffsetSeconds = 0f;
 

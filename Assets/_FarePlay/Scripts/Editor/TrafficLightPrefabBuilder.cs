@@ -9,7 +9,8 @@ namespace FarePlay
     ///   TrafficLight (root, sits on the road centre at the stop line; +Z = the way traffic drives)
     ///     Post        pole + housing + 3 lamps on the right-hand side, outside the wall
     ///     StopLine    TrafficStopLine trigger across the road + a painted white line
-    /// Run it again to rebuild the prefab (instances in scenes keep their position and offset).
+    /// Only run it to create the prefab. Rebuilding replaces every object inside it, which can break
+    /// links to placed lights (Route > Lights In Order, offsets). To tweak the light, edit the prefab instead.
     /// </summary>
     public static class TrafficLightPrefabBuilder
     {
