@@ -33,27 +33,27 @@ Handoff from the planning sessions (Sep 25–28, 2026). Shared by both teammates
 - Unity 6 APIs: `rb.linearVelocity` (not `velocity`). Active Input Handling = Both; scripts use `Input.GetAxis/GetKeyDown`.
 - `StopZone` checks "whole bus inside" with axis-aligned bounds: keep bays aligned to world X/Z and ~1–2 m larger than the bus.
 
-### Script status (as of Sep 29)
+### Script status (as of Sep 30)
 - **Implemented:** BusController, CameraDirector, GameManager, RaceTimer, StartLine/FinishLine, HUD (timer, centre message, score, passengers, route name, signal indicator; all slots optional), Route, GameEvents, GameState, RunResult, GameTuning, StopZone + BusStop (#10, Yuyang), BusCollisionPenalty (#7), ScoreManager (#11), ResultsScreen (#17).
-- **Still skeletons with TODOs:** TrafficLight, TrafficStopLine (#13).
+- **Still skeletons with TODOs:** none. TrafficLight + TrafficStopLine done in #13 (a stop line outside a Route falls back to the active route).
 
 ## GitHub issues (verify with `gh issue list --state all`)
-| # | Issue | Owner | Status (Sep 29) |
+| # | Issue | Owner | Status (Sep 30) |
 |---|---|---|---|
 | 1 | Set up the Unity project + Course Library | Ruchir | ✅ closed |
 | 2 | Teammate: clone, open, press Play | Yuyang | ✅ closed |
 | 3 | Bus driving | A | ✅ done |
 | 4 | Chase camera | A | ✅ done |
 | 5 | Overview camera 30 s -> chase switch (needs an OverviewPose object in Main) | A | Mon |
-| 6 | Route 1 blockout in Main.unity | A | in PR: ~665 m staircase, walls, 3 stops, 11 obstacles |
+| 6 | Route 1 blockout in Main.unity | A | ✅ done (PR #37): ~665 m staircase, walls, 3 stops, 11 obstacles |
 | 7 | Collision penalty (BusCollisionPenalty) | A | ✅ done (PR #34) |
 | 8 | Game flow | B (done by Ruchir) | ✅ done |
 | 9 | Start lines, finish line, 1:30 timer | B (done by Ruchir) | ✅ done |
 | 10 | Bus stops (StopZone + BusStop.prefab) | B | ✅ done (PR #30) |
 | 11 | Scoring (ScoreManager.BuildResult, LiveScore) | B | ✅ done (PR #31) |
 | 12 | HUD v1: timer, score, passengers | B | ✅ done (PR #33) |
-| 13 | Traffic lights: cycle, stop line, red-light violations | A | Tue |
-| 14 | Bus stop right before each light | A | Tue |
+| 13 | Traffic lights: cycle, stop line, red-light violations | A | in PR: TrafficLight.prefab (menu: Fare Play > Build Traffic Light Prefab), 2 lights on Route 1 |
+| 14 | Bus stop right before each light | A | in PR: stops 1 and 2 sit ~13 m before lights 1 and 2 |
 | 15 | Route 2 | A | Wed (should) |
 | 16 | HUD signal indicator | B | ✅ done (PR #35) |
 | 17 | Results screen + Restart button | B | ✅ done (PR #36) |
