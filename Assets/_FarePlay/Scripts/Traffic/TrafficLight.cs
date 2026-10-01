@@ -15,13 +15,15 @@ namespace FarePlay
         [SerializeField] float greenSeconds = 8f;
         [SerializeField] float yellowSeconds = 2f;
         [SerializeField] float redSeconds = 8f;
-        [Tooltip("Different offsets keep lights on the same route out of sync.")]
+        [Tooltip("Seconds already into the cycle at start. Different offsets keep lights on the same route out of sync.")]
         [SerializeField] float startOffsetSeconds = 0f;
 
         [Header("Lamps")]
         [SerializeField] Renderer greenLamp;
         [SerializeField] Renderer yellowLamp;
         [SerializeField] Renderer redLamp;
+        [Tooltip("How bright an unlit lamp is, compared to a lit one.")]
+        [SerializeField, Range(0f, 1f)] float dimBrightness = 0.15f;
 
         public SignalState State { get; private set; } = SignalState.Green;
         public float SecondsUntilChange { get; private set; }
@@ -29,22 +31,67 @@ namespace FarePlay
         /// <summary>Raised whenever the light changes color.</summary>
         public event Action<SignalState> Changed;
 
+        float CycleSeconds => greenSeconds + yellowSeconds + redSeconds;
+
         void Start()
         {
-            // TODO: SecondsUntilChange = greenSeconds - startOffsetSeconds (keep it above 0); SetState(Green).
+            // Work out where in the cycle the offset puts us, so any offset is valid.
+            float t = CycleSeconds > 0f ? Mathf.Repeat(startOffsetSeconds, CycleSeconds) : 0f;
+            if (t < greenSeconds)
+            {
+                SecondsUntilChange = greenSeconds - t;
+                SetState(SignalState.Green);
+            }
+            else if (t < greenSeconds + yellowSeconds)
+            {
+                SecondsUntilChange = greenSeconds + yellowSeconds - t;
+                SetState(SignalState.Yellow);
+            }
+            else
+            {
+                SecondsUntilChange = CycleSeconds - t;
+                SetState(SignalState.Red);
+            }
         }
 
         void Update()
         {
-            // TODO: SecondsUntilChange -= Time.deltaTime. At <= 0, go Green -> Yellow -> Red -> Green,
-            //       reset SecondsUntilChange to the new phase's duration, and call SetState.
+            SecondsUntilChange -= Time.deltaTime;
+            if (SecondsUntilChange > 0f) return;
+
+            // Carry the leftover time over, so the cycle doesn't drift.
+            switch (State)
+            {
+                case SignalState.Green:
+                    SecondsUntilChange += yellowSeconds;
+                    SetState(SignalState.Yellow);
+                    break;
+                case SignalState.Yellow:
+                    SecondsUntilChange += redSeconds;
+                    SetState(SignalState.Red);
+                    break;
+                default:
+                    SecondsUntilChange += greenSeconds;
+                    SetState(SignalState.Green);
+                    break;
+            }
         }
 
         void SetState(SignalState newState)
         {
             State = newState;
-            // TODO: light up the active lamp and dim the others (swap materials or toggle emission).
+            SetLamp(greenLamp,  Color.green,                 newState == SignalState.Green);
+            SetLamp(yellowLamp, new Color(1f, 0.75f, 0f),    newState == SignalState.Yellow);
+            SetLamp(redLamp,    Color.red,                   newState == SignalState.Red);
             Changed?.Invoke(newState);
+        }
+
+        void SetLamp(Renderer lamp, Color color, bool lit)
+        {
+            if (lamp == null) return;
+            Color c = lit ? color : color * dimBrightness;
+            c.a = 1f;
+            lamp.material.color = c;
         }
     }
 }
