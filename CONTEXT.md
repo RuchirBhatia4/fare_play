@@ -4,7 +4,8 @@ Handoff from the planning sessions (Sep 25–28, 2026). Shared by both teammates
 
 ## The project
 - **Fare Play**: a Unity 6 (URP) bus-driving game. Class team project, **Assignment 2**.
-- **Deadline: Friday Oct 2, 2026, 1 PM** (submit on Brightspace in the morning). Web build must be hosted publicly (Unity Play or GitHub Pages; Assignment 1 required that, assume the same).
+- **Deadline: Friday Oct 2, 2026, 1 PM** (submit on Brightspace in the morning).
+- **Web build (live):** https://ruchirbhatia4.github.io/fare-play-web/ — GitHub Pages from the public repo `RuchirBhatia4/fare-play-web` (branch `master`). To update: Unity Build Profiles → Web → Build into `~/fare_play_web` (compression Disabled, already set), then `git add -A`, commit and push in that folder. The URL stays the same.
 - **Team:** Ruchir Bhatia (GitHub `RuchirBhatia4`) = Lane A, Driving & World. Yuyang Bai = Lane B, Rules & UI.
 - **Repo:** https://github.com/RuchirBhatia4/fare_play (private). Ruchir's local path: `~/fare_play` on macOS (zsh). `gh` CLI is logged in. Git LFS is on.
 - **Chat:** Discord server; `#github-feed` receives GitHub webhook events.
@@ -38,13 +39,13 @@ Handoff from the planning sessions (Sep 25–28, 2026). Shared by both teammates
 - **Still skeletons with TODOs:** none. TrafficLight + TrafficStopLine done in #13 (a stop line outside a Route falls back to the active route).
 
 ## GitHub issues (verify with `gh issue list --state all`)
-| # | Issue | Owner | Status (Sep 30) |
+| # | Issue | Owner | Status (Oct 1) |
 |---|---|---|---|
 | 1 | Set up the Unity project + Course Library | Ruchir | ✅ closed |
 | 2 | Teammate: clone, open, press Play | Yuyang | ✅ closed |
 | 3 | Bus driving | A | ✅ done |
 | 4 | Chase camera | A | ✅ done |
-| 5 | Overview camera 30 s -> chase switch (needs an OverviewPose object in Main) | A | Mon |
+| 5 | Overview camera 30 s -> chase switch | A | ✅ done (PR #39) |
 | 6 | Route 1 blockout in Main.unity | A | ✅ done (PR #37): ~665 m staircase, walls, 3 stops, 11 obstacles |
 | 7 | Collision penalty (BusCollisionPenalty) | A | ✅ done (PR #34) |
 | 8 | Game flow | B (done by Ruchir) | ✅ done |
@@ -52,15 +53,15 @@ Handoff from the planning sessions (Sep 25–28, 2026). Shared by both teammates
 | 10 | Bus stops (StopZone + BusStop.prefab) | B | ✅ done (PR #30) |
 | 11 | Scoring (ScoreManager.BuildResult, LiveScore) | B | ✅ done (PR #31) |
 | 12 | HUD v1: timer, score, passengers | B | ✅ done (PR #33) |
-| 13 | Traffic lights: cycle, stop line, red-light violations | A | in PR: TrafficLight.prefab (menu: Fare Play > Build Traffic Light Prefab), 2 lights on Route 1 |
-| 14 | Bus stop right before each light | A | in PR: stops 1 and 2 sit ~13 m before lights 1 and 2 |
+| 13 | Traffic lights: cycle, stop line, red-light violations | A | ✅ done (PR #38). TrafficLight.prefab (menu: Fare Play > Build Traffic Light Prefab) |
+| 14 | Bus stop right before each light | A | ✅ done (PR #38) |
 | 15 | Route 2 | A | Wed (should) |
 | 16 | HUD signal indicator | B | ✅ done (PR #35) |
 | 17 | Results screen + Restart button | B | ✅ done (PR #36) |
 | 18 | Overview instructions + Space skip | B (done by Ruchir) | ✅ done |
-| 19 | First WebGL build at a public URL | B | Wed |
+| 19 | First WebGL build at a public URL | B (done by Ruchir) | ✅ done: GitHub Pages link above |
 | 20 | Playtest + balance | both | Wed-Thu |
-| 21 | Bug bash | both | Thu |
+| 21 | Bug bash | both | Thu. Fixed so far: road pieces flattened to y 0.005 so the bus can't snag at corners (PR #40) |
 | 22 | Feature freeze Thu 6 PM + final build | B | Thu |
 | 23 | Submit on Brightspace | both | Fri morning |
 | 24 | Fuel bar (stretch) | A | Thu if ahead |
