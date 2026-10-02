@@ -58,8 +58,13 @@ namespace FarePlay
         /// <summary>"1:05"-style text for the HUD.</summary>
         public string Formatted()
         {
-            int total = Mathf.CeilToInt(Mathf.Max(0f, SecondsLeft));
-            return $"{total / 60}:{total % 60:00}";
+            // To the thousandth: "1:29.874". Fixed-width digits so the timer doesn't wobble;
+            // the milliseconds are drawn smaller, racing-game style.
+            int ms = Mathf.FloorToInt(Mathf.Max(0f, SecondsLeft) * 1000f);
+            int minutes = ms / 60000;
+            int seconds = ms / 1000 % 60;
+            int thousandths = ms % 1000;
+            return $"<mspace=0.6em>{minutes}:{seconds:00}</mspace><size=60%><mspace=0.6em>.{thousandths:000}</mspace></size>";
         }
     }
 }

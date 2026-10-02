@@ -6,6 +6,7 @@ namespace FarePlay
     /// LANE A. Put on the bus. Holding the throttle burns fuel; with an empty tank the bus can only
     /// coast, brake and reverse. Stopping properly in a bus stop bay refuels, so skipping stops is risky.
     /// Running dry and rolling to a stop outside a bay ends the run: "Game over: out of fuel".
+    /// Boosting burns fuel 3x faster and every passenger adds weight, so a full bus burns more.
     /// The HUD's fuel bar reads Fuel01.
     /// Issue: "Fuel: the throttle drains a fuel bar"
     /// </summary>
@@ -45,8 +46,13 @@ namespace FarePlay
             bool driving = GameManager.Instance == null || GameManager.Instance.State == GameState.Driving;
             if (!driving) return;
 
-            if (bus.IsThrottling)
-                Fuel -= tuning.fuelPerSecondAtFullThrottle * Time.deltaTime;
+            if (bus.IsThrottling || bus.Boosting)
+            {
+                float rate = tuning.fuelPerSecondAtFullThrottle
+                           * (1f + tuning.weightFuelPerPassenger * bus.PassengersAboard)
+                           * (bus.Boosting ? tuning.boostFuelMultiplier : 1f);
+                Fuel -= rate * Time.deltaTime;
+            }
 
             if (IsParkedInABay())
                 Fuel += tuning.refuelPerSecond * Time.deltaTime;

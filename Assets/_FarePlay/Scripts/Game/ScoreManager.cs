@@ -58,13 +58,13 @@ namespace FarePlay
             int collisionPoints = tuning != null
                 ? -Collisions * tuning.collisionPenalty
                 : 0;
-            int timeBonus = won && tuning != null
-                ? Mathf.FloorToInt(secondsRemaining) * tuning.timeBonusPerSecond
+            float timeBonus = won && tuning != null
+                ? Mathf.Round(secondsRemaining * tuning.timeBonusPerSecond * 100f) / 100f   // exact time, kept to 2 decimals
                 : 0;
 
-            int total = 0;
+            float total = 0f;
             if (won)
-                total = Mathf.Max(0, passengerPoints + timeBonus + redLightPoints + collisionPoints);
+                total = Mathf.Max(0f, passengerPoints + timeBonus + redLightPoints + collisionPoints);
 
             string routeName = "";
             if (GameManager.Instance != null && GameManager.Instance.ActiveRoute != null)

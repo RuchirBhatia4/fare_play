@@ -26,10 +26,18 @@ namespace FarePlay
         [SerializeField] float positionSharpness = 6f;
         [SerializeField] float rotationSharpness = 8f;
 
+        [Header("Top view (toggle while driving)")]
+        [Tooltip("Press this to switch between the chase view and a steep top view, handy for lining up with bus stops.")]
+        [SerializeField] KeyCode switchViewKey = KeyCode.C;
+        [Tooltip("Camera position relative to the bus in top view: high up and a little behind (about 70 degrees down).")]
+        [SerializeField] Vector3 topViewOffset = new Vector3(0f, 20f, -6f);
+        [SerializeField] float topViewLookAhead = 2f;
+
         [Header("Overview -> chase switch")]
         [SerializeField] float blendSeconds = 1.5f;
 
         bool chasing;
+        bool topView;
         float blendStartTime = -999f;
         Vector3 blendFromPosition;
         Quaternion blendFromRotation;
@@ -75,6 +83,12 @@ namespace FarePlay
             }
             if (bus == null) return;
 
+            if (Input.GetKeyDown(switchViewKey))
+            {
+                topView = !topView;
+                GameEvents.RaisePopup(topView ? "<size=60%>Top view  (C)</size>" : "<size=60%>Chase view  (C)</size>");
+            }
+
             GetChasePose(out Vector3 targetPosition, out Quaternion targetRotation);
 
             // During the swoop: ease from the overview pose to the chase pose.
@@ -97,8 +111,9 @@ namespace FarePlay
         {
             // Follow the bus's heading only, so bumps don't shake the camera.
             Quaternion heading = Quaternion.Euler(0f, bus.eulerAngles.y, 0f);
-            position = bus.position + heading * chaseOffset;
-            Vector3 lookTarget = bus.position + heading * Vector3.forward * lookAhead + Vector3.up * lookHeight;
+            position = bus.position + heading * (topView ? topViewOffset : chaseOffset);
+            float ahead = topView ? topViewLookAhead : lookAhead;
+            Vector3 lookTarget = bus.position + heading * Vector3.forward * ahead + Vector3.up * (topView ? 0f : lookHeight);
             rotation = Quaternion.LookRotation(lookTarget - position, Vector3.up);
         }
 

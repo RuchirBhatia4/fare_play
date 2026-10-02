@@ -4,7 +4,8 @@ namespace FarePlay
 {
     /// <summary>
     /// LANE A. A trigger across the road at a light's stop line. Crossing it on red costs points,
-    /// once per light. Yellow is fine. Running the red is allowed; it just costs points.
+    /// once per light. Yellow is fine. Running the red is allowed; it just costs points,
+    /// unless the bus is boosting: then it "beats the light" for free.
     /// Put it as a CHILD of the TrafficLight (inside a Route) and it finds both by itself.
     /// Adding this component sizes its Box Collider automatically (14 m wide = one road).
     /// Issue: "Traffic lights: cycle, stop line and red-light violations"
@@ -40,7 +41,8 @@ namespace FarePlay
         void OnTriggerEnter(Collider other)
         {
             if (trafficLight == null) return;
-            if (other.GetComponentInParent<BusController>() == null) return;
+            BusController bus = other.GetComponentInParent<BusController>();
+            if (bus == null) return;
 
             // Sandbox testing: no GameManager means we're always "driving".
             bool driving = GameManager.Instance == null || GameManager.Instance.State == GameState.Driving;
@@ -49,8 +51,19 @@ namespace FarePlay
             if (trafficLight.State == SignalState.Red && !penalized)
             {
                 penalized = true;
-                GameEvents.RaiseRedLightViolation();
-                Debug.Log($"Red light violation at {trafficLight.name}");
+                if (bus.Boosting)
+                {
+                    // Twist: boosting through a red "beats the light". No penalty.
+                    GameEvents.RaisePopup("<color=#66D9FF>BEAT THE LIGHT!</color>\n<size=55%>boosted through the red</size>");
+                    Debug.Log($"Boosted through the red at {trafficLight.name}: no penalty");
+                }
+                else
+                {
+                    GameEvents.RaiseRedLightViolation();
+                    int penalty = GameManager.Instance != null && GameManager.Instance.Tuning != null ? GameManager.Instance.Tuning.redLightPenalty : 50;
+                    GameEvents.RaisePopup($"<color=#FF6B6B>RAN A RED</color>\n<size=55%>-{penalty:N0}  (boost through it next time)</size>");
+                    Debug.Log($"Red light violation at {trafficLight.name}");
+                }
             }
 
             if (!passed)
