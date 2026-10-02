@@ -16,7 +16,7 @@ namespace FarePlay
         [Serializable]
         public class Entry
         {
-            public int score;
+            public float score;
             public float secondsLeft;
             public int passengers;
             public string date;

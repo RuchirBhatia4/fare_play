@@ -12,11 +12,11 @@ namespace FarePlay
     public class GameTuning : ScriptableObject
     {
         [Header("Score")]
-        public int pointsPerPassenger = 10000;
-        [Tooltip("Added at the finish: exact seconds left x this. 1000 = 1 point per millisecond.")]
-        public int timeBonusPerSecond = 1000;
-        public int redLightPenalty = 5000;
-        public int collisionPenalty = 5000;
+        public int pointsPerPassenger = 100;
+        [Tooltip("Added at the finish: exact seconds left x this, with decimals (9.876 s x 10 = +98.76).")]
+        public int timeBonusPerSecond = 10;
+        public int redLightPenalty = 50;
+        public int collisionPenalty = 50;
         [Tooltip("A long scrape along a wall should count once, not every frame.")]
         public float collisionCooldownSeconds = 1f;
 

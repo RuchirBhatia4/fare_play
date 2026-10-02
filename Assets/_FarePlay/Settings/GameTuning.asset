@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81b390ad49e184e8a8487b44a5d69e5c, type: 3}
   m_Name: GameTuning
   m_EditorClassIdentifier: Assembly-CSharp::FarePlay.GameTuning
-  pointsPerPassenger: 10000
-  timeBonusPerSecond: 1000
-  redLightPenalty: 5000
-  collisionPenalty: 5000
+  pointsPerPassenger: 100
+  timeBonusPerSecond: 10
+  redLightPenalty: 50
+  collisionPenalty: 50
   collisionCooldownSeconds: 1
   overviewSeconds: 30
   stoppedSpeedThreshold: 0.3

@@ -17,8 +17,8 @@ namespace FarePlay
         public int CollisionPoints;        // negative
 
         public float SecondsRemaining;
-        public int TimeBonus;              // positive, only when Won
+        public float TimeBonus;            // positive, only when Won; exact to the millisecond (9.876 s x 10 = 98.76)
 
-        public int Total;                  // never below 0; 0 when failed
+        public float Total;                // never below 0; 0 when failed; has decimals from the time bonus
     }
 }

@@ -56,7 +56,7 @@ namespace FarePlay
                 Row("Red lights", $"{result.RedLightViolations} × -{perRed:N0}", result.RedLightPoints) +
                 Row("Collisions", $"{result.Collisions} × -{perHit:N0}", result.CollisionPoints) +
                 $"<color={Muted}>________________________________________</color>\n" +
-                $"<size=130%><b>TOTAL<pos=72%>{result.Total:N0}</b></size>";
+                $"<size=130%><b>TOTAL<pos=72%>{result.Total:N2}</b></size>";
 
             if (!result.Won)
                 text += $"\n<size=80%><color={Muted}>Failed runs score 0</color></size>";
@@ -83,7 +83,7 @@ namespace FarePlay
             for (int i = 0; i < entries.Count; i++)
             {
                 BestScores.Entry e = entries[i];
-                string line = $"{i + 1}.  {e.score:N0}<pos=50%><size=85%>{e.secondsLeft:0.000} s  ·  {e.passengers} pax</size>";
+                string line = $"{i + 1}.  {e.score:N2}<pos=50%><size=85%>{e.secondsLeft:0.000} s  ·  {e.passengers} pax</size>";
                 text += (i == rank ? $"<color={Gold}>{line}  <size=70%>NEW</size></color>" : line) + "\n";
             }
 
@@ -94,12 +94,16 @@ namespace FarePlay
         }
 
         /// <summary>One line: label, how it was worked out, and the coloured points.</summary>
-        static string Row(string label, string detail, int points) =>
+        static string Row(string label, string detail, float points) =>
             $"{label}<pos=38%><color={Muted}>{detail}</color><pos=72%>{Points(points)}\n";
 
-        static string Points(int value) =>
-            value > 0 ? $"<color={Good}>+{value:N0}</color>"
-          : value < 0 ? $"<color={Bad}>{value:N0}</color>"
-          : $"<color={Muted}>0</color>";
+        /// <summary>Whole numbers stay whole (+300); the time bonus keeps its decimals (+98.76).</summary>
+        static string Points(float value)
+        {
+            string number = Mathf.Approximately(value, Mathf.Round(value)) ? value.ToString("N0") : value.ToString("N2");
+            return value > 0 ? $"<color={Good}>+{number}</color>"
+                 : value < 0 ? $"<color={Bad}>{number}</color>"
+                 : $"<color={Muted}>0</color>";
+        }
     }
 }
