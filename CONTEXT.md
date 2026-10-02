@@ -34,6 +34,12 @@ Handoff from the planning sessions (Sep 25–28, 2026). Shared by both teammates
 - Unity 6 APIs: `rb.linearVelocity` (not `velocity`). Active Input Handling = Both; scripts use `Input.GetAxis/GetKeyDown`.
 - `StopZone` checks "whole bus inside" with axis-aligned bounds: keep bays aligned to world X/Z and ~1–2 m larger than the bus.
 
+### Difficulty pass (Oct 1)
+- `TrafficCar` (Traffic/): kinematic ping-pong cars in the oncoming lanes on Road1, Road2, Road4, Road5 (tagged Obstacle incl. children).
+- `BusFuel` (Bus/): throttle drains fuel, parking in a bay refuels, empty + stopped outside a bay = "Game over: out of fuel".
+- `BusStop` patience: `leaveAfterSeconds` per stop (30 / 60 / 78 s in Main), passengers flash red then leave.
+- Tuning: collision penalty 50, stopped threshold 0.3, bays 5 x 12 m, fuel drain 2.5/s, refuel 15/s.
+
 ### Script status (as of Sep 30)
 - **Implemented:** BusController, CameraDirector, GameManager, RaceTimer, StartLine/FinishLine, HUD (timer, centre message, score, passengers, route name, signal indicator; all slots optional), Route, GameEvents, GameState, RunResult, GameTuning, StopZone + BusStop (#10, Yuyang), BusCollisionPenalty (#7), ScoreManager (#11), ResultsScreen (#17).
 - **Still skeletons with TODOs:** none. TrafficLight + TrafficStopLine done in #13 (a stop line outside a Route falls back to the active route).
@@ -64,8 +70,8 @@ Handoff from the planning sessions (Sep 25–28, 2026). Shared by both teammates
 | 21 | Bug bash | both | Thu. Fixed so far: road pieces flattened to y 0.005 so the bus can't snag at corners (PR #40) |
 | 22 | Feature freeze Thu 6 PM + final build | B | Thu |
 | 23 | Submit on Brightspace | both | Fri morning |
-| 24 | Fuel bar (stretch) | A | Thu if ahead |
-| 25 | Fuel station (stretch) | B | Thu if ahead |
+| 24 | Fuel bar (stretch) | A | ✅ done (difficulty pass): BusFuel, HUD bar, refuel while parked in a bay, game over when stranded |
+| 25 | Fuel station (stretch) | B | ✅ done via bus stop bays (difficulty pass) |
 | 26 | Passenger capacity (stretch) | B | if ahead |
 | 27 | Sounds (stretch) | both | if ahead |
 
