@@ -46,6 +46,15 @@ namespace FarePlay
         /// <summary>Stretch: the fuel system sets this to false when the tank is empty.</summary>
         public bool HasFuel { get; set; } = true;
 
+        /// <summary>Passengers on the bus. Each one makes it heavier (see GameTuning > Weight).</summary>
+        public int PassengersAboard { get; private set; }
+
+        /// <summary>BusBoost sets this while the player is boosting: faster top speed and acceleration.</summary>
+        public bool Boosting { get; set; }
+
+        /// <summary>True while the bus is braking hard (regenerative braking charges the boost).</summary>
+        public bool IsBraking { get; private set; }
+
         Rigidbody rb;
         float throttleInput;
         float steerInput;
@@ -61,8 +70,22 @@ namespace FarePlay
             rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ; // can't tip over
         }
 
-        void OnEnable()  { GameEvents.StateChanged += HandleStateChanged; }
-        void OnDisable() { GameEvents.StateChanged -= HandleStateChanged; }
+        void OnEnable()
+        {
+            GameEvents.StateChanged += HandleStateChanged;
+            GameEvents.PassengerBoarded += HandlePassengerBoarded;
+        }
+
+        void OnDisable()
+        {
+            GameEvents.StateChanged -= HandleStateChanged;
+            GameEvents.PassengerBoarded -= HandlePassengerBoarded;
+        }
+
+        void HandlePassengerBoarded() { PassengersAboard++; }
+
+        /// <summary>1 for an empty bus, lower for each passenger (never below 0.2).</summary>
+        float Load(float lossPerPassenger) => Mathf.Max(0.2f, 1f - lossPerPassenger * PassengersAboard);
 
         void Start()
         {
@@ -87,6 +110,22 @@ namespace FarePlay
             float dt = Time.fixedDeltaTime;
             Vector3 forward = rb.rotation * Vector3.forward;
 
+            // Weight and boost scale the driving numbers. No GameManager (sandbox) = no weight.
+            GameTuning tuning = GameManager.Instance != null ? GameManager.Instance.Tuning : null;
+            float topSpeed = maxSpeed, accel = acceleration, brake = brakeDeceleration, turn = turnDegreesPerSecond;
+            if (tuning != null)
+            {
+                topSpeed *= Load(tuning.weightTopSpeedPerPassenger);
+                accel    *= Load(tuning.weightAccelerationPerPassenger);
+                brake    *= Load(tuning.weightBrakingPerPassenger);
+                turn     *= Load(tuning.weightSteeringPerPassenger);
+                if (Boosting)
+                {
+                    topSpeed *= tuning.boostTopSpeedMultiplier;
+                    accel    *= tuning.boostAccelerationMultiplier;
+                }
+            }
+
             // 1. Did we hit something? If the bus lost a lot of speed since last step, a collision
             //    stopped it, so adopt the real speed (otherwise it would keep "pushing" into walls).
             float actualSpeed = Vector3.Dot(rb.linearVelocity, forward);
@@ -101,26 +140,28 @@ namespace FarePlay
 
             float target;
             float rate;
+            bool braking = false;
             if (throttle > 0.01f)
             {
-                if (CurrentSpeed < -0.1f) { target = 0f; rate = brakeDeceleration; }          // rolling back: brake first
-                else                      { target = maxSpeed * throttle; rate = acceleration; }
+                if (CurrentSpeed < -0.1f) { target = 0f; rate = brake; braking = true; }       // rolling back: brake first
+                else                      { target = topSpeed * throttle; rate = accel; }
             }
             else if (throttle < -0.01f)
             {
-                if (CurrentSpeed > 0.1f)  { target = 0f; rate = brakeDeceleration; }          // brake...
-                else                      { target = maxReverseSpeed * throttle; rate = acceleration; } // ...then reverse
+                if (CurrentSpeed > 0.1f)  { target = 0f; rate = brake; braking = true; }       // brake...
+                else                      { target = maxReverseSpeed * throttle; rate = accel; } // ...then reverse
             }
             else
             {
                 target = 0f; rate = coastDeceleration;                                        // no key: roll to a stop
             }
+            IsBraking = braking && Mathf.Abs(CurrentSpeed) > 1f;
             CurrentSpeed = Mathf.MoveTowards(CurrentSpeed, target, rate * dt);
 
             // 3. Steering. steerFactor goes 0 -> 1 as you speed up, and turns negative when reversing,
             //    so backing up steers like a real vehicle.
             float steerFactor = Mathf.Clamp(CurrentSpeed / fullSteerSpeed, -1f, 1f);
-            float turnRadiansPerSecond = steerInput * turnDegreesPerSecond * steerFactor * Mathf.Deg2Rad;
+            float turnRadiansPerSecond = steerInput * turn * steerFactor * Mathf.Deg2Rad;
             rb.angularVelocity = new Vector3(0f, turnRadiansPerSecond, 0f);
 
             // 4. Move. Keep the vertical velocity so gravity still works.

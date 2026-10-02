@@ -29,16 +29,38 @@ namespace FarePlay
  
         [Header("Fuel (stretch)")]
         [SerializeField] Image fuelFill;
+
+        [Header("Boost and load (the twist)")]
+        [Tooltip("Filled Image, like the fuel bar.")]
+        [SerializeField] Image boostFill;
+        [Tooltip("Small text next to the boost bar: 'BOOST' / 'BOOST READY' / 'BOOSTING'.")]
+        [SerializeField] TMP_Text boostText;
+        [Tooltip("Shows how heavy the bus is: 'Load 6  (heavier)'.")]
+        [SerializeField] TMP_Text loadText;
+        [Tooltip("How long a popup ('PERFECT STOP!') stays in the middle of the screen.")]
+        [SerializeField] float popupSeconds = 1.8f;
  
         [Header("Look")]
         [SerializeField] float lowTimeWarningSeconds = 15f;
         [SerializeField] Color normalTimeColor = Color.white;
         [SerializeField] Color lowTimeColor = new Color(1f, 0.3f, 0.3f);
  
+        string popup;
+        float popupUntil;
+
         void Awake()
         {
             if (timer == null) timer = GetComponentInParent<RaceTimer>();
             if (score == null) score = GetComponentInParent<ScoreManager>();
+        }
+
+        void OnEnable()  { GameEvents.Popup += HandlePopup; }
+        void OnDisable() { GameEvents.Popup -= HandlePopup; }
+
+        void HandlePopup(string message)
+        {
+            popup = message;
+            popupUntil = Time.time + popupSeconds;
         }
  
         void Update()
@@ -56,10 +78,40 @@ namespace FarePlay
             if (scoreText != null && score != null)      scoreText.text = $"Score {score.LiveScore}";
             if (passengersText != null && score != null) passengersText.text = $"Passengers {score.PassengersOnBoard}";
             if (routeText != null)                       routeText.text = gm.ActiveRoute != null ? gm.ActiveRoute.DisplayName : "";
-            if (messageText != null)                     messageText.text = MessageFor(gm);
- 
+            if (messageText != null)
+            {
+                bool showPopup = gm.State == GameState.Driving && Time.time < popupUntil;
+                messageText.text = showPopup ? popup : MessageFor(gm);
+            }
+
             UpdateSignal(gm);
             UpdateFuel();
+            UpdateBoostAndLoad();
+        }
+
+        void UpdateBoostAndLoad()
+        {
+            BusBoost boost = BusBoost.Current;
+            float fill = boost != null ? boost.Fill01 : 0f;
+            bool boosting = boost != null && boost.Boosting;
+
+            if (boostFill != null)
+            {
+                boostFill.fillAmount = fill;
+                Color idle = new Color(0.25f, 0.6f, 1f);
+                Color hot = new Color(0.55f, 0.95f, 1f);
+                boostFill.color = boosting ? hot : fill >= 0.99f ? Color.Lerp(idle, hot, Mathf.PingPong(Time.time * 3f, 1f)) : idle;
+            }
+
+            if (boostText != null)
+                boostText.text = boosting ? "BOOSTING" : fill >= 0.99f ? "BOOST READY" : fill > 0f ? "BOOST (Shift)" : "BOOST";
+
+            if (loadText != null)
+            {
+                BusController bus = BusController.Current;
+                int load = bus != null ? bus.PassengersAboard : 0;
+                loadText.text = load == 0 ? "Load: empty" : $"Load: {load}  <size=80%>(heavier)</size>";
+            }
         }
 
         void UpdateFuel()

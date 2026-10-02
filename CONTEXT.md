@@ -34,6 +34,14 @@ Handoff from the planning sessions (Sep 25–28, 2026). Shared by both teammates
 - Unity 6 APIs: `rb.linearVelocity` (not `velocity`). Active Input Handling = Both; scripts use `Input.GetAxis/GetKeyDown`.
 - `StopZone` checks "whole bus inside" with axis-aligned bounds: keep bays aligned to world X/Z and ~1–2 m larger than the bus.
 
+### The twist: brakes as boost (Oct 1)
+- Logline: "A time-trial racing game where braking charges your boost and every passenger makes your bus heavier (Racing + Brakes as Boost)."
+- `BusBoost` (Bus/): each bay grades the stop once (PERFECT / GOOD / SLOPPY by offset from the bay centre line and angle) and charges boost (3 / 1.8 / 0.75 s); PERFECT streaks combo (+50% per step); hard braking regenerates boost (+10% per passenger). Hold Shift to boost (x1.5 top speed, x2 accel).
+- `BusController`: weight per passenger aboard (-5% accel, -4% braking, -3% steering, -1.5% top speed); `Boosting`, `IsBraking`, `PassengersAboard`.
+- `BusFuel`: boosting burns x3, +5% per passenger. `TrafficStopLine`: boosting through a red = "BEAT THE LIGHT!", no penalty.
+- HUD: popups via `GameEvents.Popup`, boost bar, load text (wired on the GameSystems instance in Main). ResultsScreen: column layout with <pos> tags, coloured points, perfect stops + best combo.
+- All numbers in GameTuning under "Weight" and "Boost". Obstacles scaled up (cones x3, crates/barrels x2, spool x1.5, boulder x1.3).
+
 ### Difficulty pass (Oct 1)
 - `TrafficCar` (Traffic/): kinematic ping-pong cars in the oncoming lanes on Road1, Road2, Road4, Road5 (tagged Obstacle incl. children).
 - `BusFuel` (Bus/): throttle drains fuel, parking in a bay refuels, empty + stopped outside a bay = "Game over: out of fuel".

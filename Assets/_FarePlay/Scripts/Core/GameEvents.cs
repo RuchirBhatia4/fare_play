@@ -30,11 +30,15 @@ namespace FarePlay
         /// <summary>The run is over, won or failed, with the full breakdown. Raised by GameManager.</summary>
         public static event Action<RunResult> RunEnded;
 
+        /// <summary>A short message to flash in the middle of the screen ("PERFECT STOP!"). Shown by the HUD.</summary>
+        public static event Action<string> Popup;
+
         public static void RaiseStateChanged(GameState state) => StateChanged?.Invoke(state);
         public static void RaiseRunStarted(Route route) => RunStarted?.Invoke(route);
         public static void RaisePassengerBoarded() => PassengerBoarded?.Invoke();
         public static void RaiseRedLightViolation() => RedLightViolation?.Invoke();
         public static void RaiseCollisionPenalty() => CollisionPenalty?.Invoke();
         public static void RaiseRunEnded(RunResult result) => RunEnded?.Invoke(result);
+        public static void RaisePopup(string message) => Popup?.Invoke(message);
     }
 }

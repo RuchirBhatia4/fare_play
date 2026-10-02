@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 2176644378460148575}
   - component: {fileID: 2809104858663229374}
   - component: {fileID: -3444771837772424923}
+  - component: {fileID: -6461584437845157682}
   m_Layer: 0
   m_Name: Bus
   m_TagString: Untagged
@@ -130,6 +131,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d272a89c1171b47e5a636f7367ba92bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FarePlay.BusFuel
+  tuning: {fileID: 11400000, guid: 69c2d1becd3794197b78893c819a94f0, type: 2}
+  outOfFuelGraceSeconds: 1
+--- !u!114 &-6461584437845157682
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2152239298649179729}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c91fb5b4d6cba43709cbf7b7ddd32b61, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FarePlay.BusBoost
   tuning: {fileID: 11400000, guid: 69c2d1becd3794197b78893c819a94f0, type: 2}
 --- !u!1001 &4634808817041686526
 PrefabInstance:
