@@ -1,6 +1,6 @@
 # 🚌 Fare Play
 
-An isometric bus game about **speed vs. service**. Study the routes from above, then drive: pick up passengers, stop properly at bus stops, deal with traffic lights, and reach the finish before the clock runs out.
+**Racing + Brakes as Boost:** a time-trial racing game where braking charges your boost and every passenger you pick up makes your bus heavier.
 
 **▶ Play it in your browser: https://ruchirbhatia4.github.io/fare-play-web/**
 
@@ -8,31 +8,36 @@ An isometric bus game about **speed vs. service**. Study the routes from above, 
 
 ## How it plays
 
-1. **Overview (30 s):** a top-down view of the route(s), with the bus locked in the depot. Press **Space** to skip.
-2. **Chase view:** the camera swoops behind the bus and you can drive.
-3. **Start line:** the **1:30 timer** starts when the bus crosses either route's start line. If it hits 0:00, the run fails.
-4. **Bus stops:** pull **fully into the bay and stop**. The bay turns green and passengers board one at a time. Drive away early and the rest stay behind.
-5. **Traffic lights:** the next light's state and countdown are always on screen. Waiting at a red? Stop at the bus stop just before it and board passengers with that time. Running a red is allowed, but it costs points.
-6. **Obstacles:** every hit costs points.
-7. **Finish line:** delivered passengers are counted, and each second left on the clock becomes bonus points.
+1. **Overview (30 s):** a top-down view of the whole route. Press **Space** to skip.
+2. **Start:** drive through the green START gate and the **1:30 timer** starts (shown to the thousandth of a second).
+3. **Bus stops:** pull fully into the bay and stop. Each stop is graded **PERFECT / GOOD / SLOPPY** by how centred and straight you are, and charges your **boost**. PERFECT stops in a row build a combo for bigger boosts.
+4. **Weight:** every passenger who boards makes the bus heavier: slower to accelerate, longer to stop, wider to turn, and it rolls on further.
+5. **Regenerative braking:** braking hard also charges boost, more when the bus is heavy.
+6. **Boost (Shift):** faster top speed and acceleration, but it burns fuel 3x faster. Boost through a red light and you **beat the light** (no penalty).
+7. **Hazards:** traffic lights, moving cars, obstacles, passengers who give up if you're late, and a fuel tank that refills only while parked in a bay. Run dry and stop outside a bay: game over.
+8. **Finish:** drive through the red FINISH gate. Your best runs (with names) are saved in your browser.
 
 ### Controls
 | Key | Action |
 |---|---|
 | ↑ / ↓ | Throttle / brake, then reverse |
 | ← / → | Steer |
+| Shift | Boost (while the boost bar has charge) |
+| C | Switch between chase view and top view (handy for lining up with bays) |
 | Space | Skip the overview |
+| R | Start over (any time during a run) |
+| P | Play again (results screen) |
 
 ### Scoring (all values live in `GameTuning.asset`)
 | | Points |
 |---|---|
 | Each passenger delivered to the finish | **+100** |
-| Each red light run | **−50** |
-| Each obstacle hit (1 s cooldown) | **−25** |
-| Time bonus at the finish | **+10 × seconds left** |
-| Run out of time | **Run failed, score 0** |
+| Each red light run (not boosting) | **−50** |
+| Each obstacle or car hit (1 s cooldown) | **−50** |
+| Time bonus at the finish | **+10 × exact seconds left** (9.876 s = +98.76) |
+| Run out of time or fuel | **Run failed, score 0** |
 
-Example: 8 passengers, one red light, two hits, 12 s left → 800 − 50 − 50 + 120 = **820**
+Example: 9 passengers, no reds, two hits, 9.876 s left → 900 − 100 + 98.76 = **898.76**
 
 ## Scope for the one-week build
 

@@ -34,6 +34,13 @@ Handoff from the planning sessions (Sep 25–28, 2026). Shared by both teammates
 - Unity 6 APIs: `rb.linearVelocity` (not `velocity`). Active Input Handling = Both; scripts use `Input.GetAxis/GetKeyDown`.
 - `StopZone` checks "whole bus inside" with axis-aligned bounds: keep bays aligned to world X/Z and ~1–2 m larger than the bus.
 
+### Final features (Oct 2)
+- Scoring: passenger +100, red/hit -50, time bonus 10/s to 2 decimals (RunResult.Total is a float). Timer shows m:ss.fff.
+- Weight per passenger: accel -7%, braking -7%, steering -5%, top speed -3%, coasts 7% further. Regen = 0.06 boost-s per m/s braked away (+10%/passenger).
+- Start/finish gates: menu Fare Play > Build Start + Finish Gates. Top view: C (CameraDirector). R restarts mid-run, P plays again on results; the results button is wired in code.
+- BestScores: top 5 finished runs per route in PlayerPrefs (browser storage on web), arcade-style name entry; ResultsScreen creates its own text if none is assigned.
+- Road1: ute, van and blue car all drive back and forth (TrafficCar).
+
 ### The twist: brakes as boost (Oct 1)
 - Logline: "A time-trial racing game where braking charges your boost and every passenger makes your bus heavier (Racing + Brakes as Boost)."
 - `BusBoost` (Bus/): each bay grades the stop once (PERFECT / GOOD / SLOPPY by offset from the bay centre line and angle) and charges boost (3 / 1.8 / 0.75 s); PERFECT streaks combo (+50% per step); hard braking regenerates boost (+10% per passenger). Hold Shift to boost (x1.5 top speed, x2 accel).
