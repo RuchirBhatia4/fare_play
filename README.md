@@ -101,7 +101,9 @@ Tools/                       setup_github.sh
 
 ## Team
 
-- **Ruchir Bhatia**
-- **(teammate)**
+| Name | GitHub | Contributions |
+|---|---|---|
+| **Ruchir Bhatia** | [RuchirBhatia4](https://github.com/RuchirBhatia4) | Bus driving and cameras, game flow and route timer, Route 1 level design with traffic and hazards, the Brakes as Boost twist, WebGL build and hosting |
+| **Yuyang Bai** | [Ne1sonBa1](https://github.com/Ne1sonBa1) | Bus stops and passenger boarding, scoring, HUD (score, passengers, next-light signal), results screen, gameplay video, Discord marketing post, final document and submission |
 
 We coordinate on Discord. GitHub activity posts to `#github-feed`.
