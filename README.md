@@ -2,6 +2,8 @@
 
 An isometric bus game about **speed vs. service**. Study the routes from above, then drive: pick up passengers, stop properly at bus stops, deal with traffic lights, and reach the finish before the clock runs out.
 
+**▶ Play it in your browser: https://ruchirbhatia4.github.io/fare-play-web/**
+
 > Original proposal: [`Docs/Fare_Play_Design_Document.pdf`](Docs/Fare_Play_Design_Document.pdf). This README describes the **current** design, which replaced it.
 
 ## How it plays
@@ -63,7 +65,7 @@ Progress is tracked in GitHub **Milestones** and on the **Fare Play** project bo
 3. Clone:
    ```bash
    git lfs install
-   git clone https://github.com/<owner>/fare-play.git
+   git clone https://github.com/RuchirBhatia4/fare_play.git
    ```
 4. Unity Hub → **Add → Add project from disk** → pick the folder. The first open takes a few minutes.
 5. Open `Assets/_FarePlay/Scenes/Main.unity` and press **Play**.
