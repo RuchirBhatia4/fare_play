@@ -33,7 +33,7 @@ namespace FarePlay
         [Header("Boost and load (the twist)")]
         [Tooltip("Filled Image, like the fuel bar.")]
         [SerializeField] Image boostFill;
-        [Tooltip("Small text next to the boost bar: 'BOOST' / 'BOOST READY' / 'BOOSTING'.")]
+        [Tooltip("The word BOOST on the boost bar.")]
         [SerializeField] TMP_Text boostText;
         [Tooltip("Shows how heavy the bus is: 'Load 6  (heavier)'.")]
         [SerializeField] TMP_Text loadText;
@@ -56,6 +56,15 @@ namespace FarePlay
         {
             if (timer == null) timer = GetComponentInParent<RaceTimer>();
             if (score == null) score = GetComponentInParent<ScoreManager>();
+
+            // The boost label sits inside a small bar: one line only, shrinking to fit if needed.
+            if (boostText != null)
+            {
+                boostText.textWrappingMode = TextWrappingModes.NoWrap;
+                boostText.enableAutoSizing = true;
+                boostText.fontSizeMin = 8f;
+                boostText.fontSizeMax = Mathf.Max(boostText.fontSize, 8f);
+            }
 
             // Shown on the left and right of the top-down overview, where the screen is empty.
             if (rulesPanel == null)    rulesPanel    = CreateSidePanel("RulesPanel", left: true, 560f, RulesText);
@@ -177,10 +186,7 @@ namespace FarePlay
             }
 
             if (boostText != null)
-                boostText.text = boosting ? "BOOSTING"
-                               : boost != null && boost.Regenerating ? "REGEN +"
-                               : fill >= 0.99f ? "BOOST READY"
-                               : fill > 0f ? "BOOST (Shift)" : "BOOST";
+                boostText.text = "BOOST";
 
             if (loadText != null)
             {
