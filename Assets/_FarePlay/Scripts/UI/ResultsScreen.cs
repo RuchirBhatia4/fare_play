@@ -35,6 +35,8 @@ namespace FarePlay
             if (panel == null) return;
             panel.SetActive(false);
 
+            if (bestScoresText == null) bestScoresText = CreateBestScoresText();
+
             // Wire the panel's button to play again, and label it with the key.
             Button button = panel.GetComponentInChildren<Button>(true);
             if (button != null)
@@ -115,6 +117,25 @@ namespace FarePlay
                         $"<pos=50%><color={Muted}>Best combo</color>  x{boost.BestCombo}</size>";
 
             breakdownText.text = text;
+        }
+
+        /// <summary>No "Best Scores Text" assigned? Make one to the right of the breakdown (1920x1080 layout).</summary>
+        TMP_Text CreateBestScoresText()
+        {
+            var go = new GameObject("BestScoresText", typeof(RectTransform));
+            go.transform.SetParent(panel.transform, false);
+            var rect = (RectTransform)go.transform;
+            rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f);
+            rect.anchoredPosition = new Vector2(560f, 10f);
+            rect.sizeDelta = new Vector2(440f, 360f);
+
+            var text = go.AddComponent<TextMeshProUGUI>();
+            if (breakdownText != null) text.font = breakdownText.font;
+            text.fontSize = 26f;
+            text.color = Color.white;
+            text.alignment = TextAlignmentOptions.TopLeft;
+            text.raycastTarget = false;
+            return text;
         }
 
         void ShowBestScores(string routeName, int rank, bool won)
