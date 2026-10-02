@@ -33,7 +33,7 @@ namespace FarePlay
         [Header("Boost and load (the twist)")]
         [Tooltip("Filled Image, like the fuel bar.")]
         [SerializeField] Image boostFill;
-        [Tooltip("Small text next to the boost bar: 'BOOST' / 'BOOST READY' / 'BOOSTING'.")]
+        [Tooltip("The word BOOST on the boost bar.")]
         [SerializeField] TMP_Text boostText;
         [Tooltip("Shows how heavy the bus is: 'Load 6  (heavier)'.")]
         [SerializeField] TMP_Text loadText;
@@ -186,10 +186,7 @@ namespace FarePlay
             }
 
             if (boostText != null)
-                boostText.text = boosting ? "BOOSTING"
-                               : boost != null && boost.Regenerating ? "REGEN"
-                               : fill >= 0.99f ? "READY"
-                               : "BOOST";
+                boostText.text = "BOOST";
 
             if (loadText != null)
             {
