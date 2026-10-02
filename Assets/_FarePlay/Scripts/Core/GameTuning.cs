@@ -12,11 +12,11 @@ namespace FarePlay
     public class GameTuning : ScriptableObject
     {
         [Header("Score")]
-        public int pointsPerPassenger = 100;
-        [Tooltip("Added at the finish: seconds left on the clock x this.")]
-        public int timeBonusPerSecond = 10;
-        public int redLightPenalty = 50;
-        public int collisionPenalty = 25;
+        public int pointsPerPassenger = 10000;
+        [Tooltip("Added at the finish: exact seconds left x this. 1000 = 1 point per millisecond.")]
+        public int timeBonusPerSecond = 1000;
+        public int redLightPenalty = 5000;
+        public int collisionPenalty = 5000;
         [Tooltip("A long scrape along a wall should count once, not every frame.")]
         public float collisionCooldownSeconds = 1f;
 
@@ -33,11 +33,13 @@ namespace FarePlay
         public int busCapacity = 0;
 
         [Header("Weight: each passenger aboard makes the bus heavier")]
-        [Tooltip("Acceleration lost per passenger (0.05 = -5%).")]
-        public float weightAccelerationPerPassenger = 0.05f;
-        public float weightBrakingPerPassenger = 0.04f;
-        public float weightSteeringPerPassenger = 0.03f;
-        public float weightTopSpeedPerPassenger = 0.015f;
+        [Tooltip("Acceleration lost per passenger (0.07 = -7%).")]
+        public float weightAccelerationPerPassenger = 0.07f;
+        public float weightBrakingPerPassenger = 0.07f;
+        public float weightSteeringPerPassenger = 0.05f;
+        public float weightTopSpeedPerPassenger = 0.03f;
+        [Tooltip("Momentum: a heavier bus slows down less when you let go of the keys (0.07 = coasts 7% further per passenger).")]
+        public float weightCoastingPerPassenger = 0.07f;
         [Tooltip("Extra fuel burn per passenger (0.05 = +5%).")]
         public float weightFuelPerPassenger = 0.05f;
 
@@ -55,8 +57,8 @@ namespace FarePlay
         public float perfectMaxAngle = 5f;
         public float goodMaxOffset = 0.6f;
         public float goodMaxAngle = 10f;
-        [Tooltip("Regenerative braking: boost seconds gained per second of hard braking (empty bus).")]
-        public float regenBoostPerBrakeSecond = 0.15f;
+        [Tooltip("Regenerative braking: boost seconds gained per m/s of speed you brake away (empty bus). A full stop from 12 m/s = 0.72 s.")]
+        public float regenBoostPerSpeedLost = 0.06f;
         [Tooltip("Heavier bus = more energy recovered: +10% regen per passenger.")]
         public float regenBonusPerPassenger = 0.1f;
         public float boostTopSpeedMultiplier = 1.5f;

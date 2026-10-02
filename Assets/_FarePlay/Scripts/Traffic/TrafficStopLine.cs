@@ -61,7 +61,7 @@ namespace FarePlay
                 {
                     GameEvents.RaiseRedLightViolation();
                     int penalty = GameManager.Instance != null && GameManager.Instance.Tuning != null ? GameManager.Instance.Tuning.redLightPenalty : 50;
-                    GameEvents.RaisePopup($"<color=#FF6B6B>RAN A RED</color>\n<size=55%>-{penalty}  (boost through it next time)</size>");
+                    GameEvents.RaisePopup($"<color=#FF6B6B>RAN A RED</color>\n<size=55%>-{penalty:N0}  (boost through it next time)</size>");
                     Debug.Log($"Red light violation at {trafficLight.name}");
                 }
             }

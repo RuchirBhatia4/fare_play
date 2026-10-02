@@ -112,13 +112,14 @@ namespace FarePlay
 
             // Weight and boost scale the driving numbers. No GameManager (sandbox) = no weight.
             GameTuning tuning = GameManager.Instance != null ? GameManager.Instance.Tuning : null;
-            float topSpeed = maxSpeed, accel = acceleration, brake = brakeDeceleration, turn = turnDegreesPerSecond;
+            float topSpeed = maxSpeed, accel = acceleration, brake = brakeDeceleration, turn = turnDegreesPerSecond, coast = coastDeceleration;
             if (tuning != null)
             {
                 topSpeed *= Load(tuning.weightTopSpeedPerPassenger);
                 accel    *= Load(tuning.weightAccelerationPerPassenger);
                 brake    *= Load(tuning.weightBrakingPerPassenger);
                 turn     *= Load(tuning.weightSteeringPerPassenger);
+                coast    *= Load(tuning.weightCoastingPerPassenger);   // momentum: heavy buses roll on
                 if (Boosting)
                 {
                     topSpeed *= tuning.boostTopSpeedMultiplier;
@@ -153,7 +154,7 @@ namespace FarePlay
             }
             else
             {
-                target = 0f; rate = coastDeceleration;                                        // no key: roll to a stop
+                target = 0f; rate = coast;                                        // no key: roll to a stop
             }
             IsBraking = braking && Mathf.Abs(CurrentSpeed) > 1f;
             CurrentSpeed = Mathf.MoveTowards(CurrentSpeed, target, rate * dt);

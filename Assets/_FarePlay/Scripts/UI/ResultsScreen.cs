@@ -39,19 +39,17 @@ namespace FarePlay
             if (breakdownText == null) return;
 
             GameTuning tuning = GameManager.Instance != null ? GameManager.Instance.Tuning : null;
-            int perPassenger = tuning != null ? tuning.pointsPerPassenger : 100;
-            int perSecond    = tuning != null ? tuning.timeBonusPerSecond : 10;
-            int perRed       = tuning != null ? tuning.redLightPenalty : 50;
-            int perHit       = tuning != null ? tuning.collisionPenalty : 25;
-            int seconds      = Mathf.FloorToInt(result.SecondsRemaining);
+            int perPassenger = tuning != null ? tuning.pointsPerPassenger : 10000;
+            int perRed       = tuning != null ? tuning.redLightPenalty : 5000;
+            int perHit       = tuning != null ? tuning.collisionPenalty : 5000;
 
             string text =
-                Row("Passengers", $"{result.PassengersDelivered} × {perPassenger}", result.PassengerPoints) +
-                Row("Time bonus", $"{seconds} s × {perSecond}", result.TimeBonus) +
-                Row("Red lights", $"{result.RedLightViolations} × -{perRed}", result.RedLightPoints) +
-                Row("Collisions", $"{result.Collisions} × -{perHit}", result.CollisionPoints) +
+                Row("Passengers", $"{result.PassengersDelivered} × {perPassenger:N0}", result.PassengerPoints) +
+                Row("Time bonus", $"{result.SecondsRemaining:0.000} s left", result.TimeBonus) +
+                Row("Red lights", $"{result.RedLightViolations} × -{perRed:N0}", result.RedLightPoints) +
+                Row("Collisions", $"{result.Collisions} × -{perHit:N0}", result.CollisionPoints) +
                 $"<color={Muted}>________________________________________</color>\n" +
-                $"<size=130%><b>TOTAL<pos=72%>{result.Total}</b></size>";
+                $"<size=130%><b>TOTAL<pos=72%>{result.Total:N0}</b></size>";
 
             if (!result.Won)
                 text += $"\n<size=80%><color={Muted}>Failed runs score 0</color></size>";
@@ -69,8 +67,8 @@ namespace FarePlay
             $"{label}<pos=38%><color={Muted}>{detail}</color><pos=72%>{Points(points)}\n";
 
         static string Points(int value) =>
-            value > 0 ? $"<color={Good}>+{value}</color>"
-          : value < 0 ? $"<color={Bad}>{value}</color>"
+            value > 0 ? $"<color={Good}>+{value:N0}</color>"
+          : value < 0 ? $"<color={Bad}>{value:N0}</color>"
           : $"<color={Muted}>0</color>";
     }
 }

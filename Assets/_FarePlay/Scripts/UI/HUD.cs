@@ -75,7 +75,7 @@ namespace FarePlay
                 timerText.color = low ? lowTimeColor : normalTimeColor;
             }
  
-            if (scoreText != null && score != null)      scoreText.text = $"Score {score.LiveScore}";
+            if (scoreText != null && score != null)      scoreText.text = $"Score {score.LiveScore:N0}";
             if (passengersText != null && score != null) passengersText.text = $"Passengers {score.PassengersOnBoard}";
             if (routeText != null)                       routeText.text = gm.ActiveRoute != null ? gm.ActiveRoute.DisplayName : "";
             if (messageText != null)
@@ -104,13 +104,19 @@ namespace FarePlay
             }
 
             if (boostText != null)
-                boostText.text = boosting ? "BOOSTING" : fill >= 0.99f ? "BOOST READY" : fill > 0f ? "BOOST (Shift)" : "BOOST";
+                boostText.text = boosting ? "BOOSTING"
+                               : boost != null && boost.Regenerating ? "REGEN +"
+                               : fill >= 0.99f ? "BOOST READY"
+                               : fill > 0f ? "BOOST (Shift)" : "BOOST";
 
             if (loadText != null)
             {
                 BusController bus = BusController.Current;
                 int load = bus != null ? bus.PassengersAboard : 0;
-                loadText.text = load == 0 ? "Load: empty" : $"Load: {load}  <size=80%>(heavier)</size>";
+                GameTuning tuning = GameManager.Instance != null ? GameManager.Instance.Tuning : null;
+                int handlingLoss = tuning != null ? Mathf.RoundToInt(Mathf.Min(0.8f, tuning.weightAccelerationPerPassenger * load) * 100f) : 0;
+                loadText.text = load == 0 ? "Load: empty"
+                              : $"Load: {load}  <size=80%><color=#FFB36B>handling -{handlingLoss}%</color></size>";
             }
         }
 
@@ -129,7 +135,7 @@ namespace FarePlay
             {
                 case GameState.Overview:
                     return $"Driving starts in {Mathf.CeilToInt(gm.OverviewSecondsLeft)}s\n" +
-                           "<size=55%>Press Space to skip  |  Arrow keys to drive</size>";
+                           "<size=55%>Space: skip  |  Arrows: drive  |  Shift: boost  |  C: top view</size>";
                 case GameState.Ready:
                     return "<size=55%>Drive through a start line to begin</size>";
                 case GameState.Won:

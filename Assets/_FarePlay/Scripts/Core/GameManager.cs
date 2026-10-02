@@ -103,7 +103,7 @@ namespace FarePlay
             LastResult = result;
             SetState(won ? GameState.Won : GameState.Failed);
             GameEvents.RaiseRunEnded(result);
-            Debug.Log($"[Fare Play] {reason}  Time left: {secondsLeft:0.0} s  Total: {result.Total}");
+            Debug.Log($"[Fare Play] {reason}  Time left: {secondsLeft:0.000} s  Total: {result.Total}");
         }
  
         /// <summary>Reloads the current scene. Also hooked to the results screen's Restart button later.</summary>

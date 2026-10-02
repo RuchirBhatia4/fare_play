@@ -59,7 +59,7 @@ namespace FarePlay
                 ? -Collisions * tuning.collisionPenalty
                 : 0;
             int timeBonus = won && tuning != null
-                ? Mathf.FloorToInt(secondsRemaining) * tuning.timeBonusPerSecond
+                ? Mathf.RoundToInt(secondsRemaining * tuning.timeBonusPerSecond)   // exact time: every millisecond counts
                 : 0;
 
             int total = 0;

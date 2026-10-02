@@ -25,11 +25,14 @@ namespace FarePlay
         public int Combo { get; private set; }
         public int BestCombo { get; private set; }
         public int PerfectStops { get; private set; }
+        /// <summary>True while braking is charging the boost (the HUD shows "REGEN").</summary>
+        public bool Regenerating { get; private set; }
 
         BusController bus;
         Collider busCollider;
         StopZone[] stopZones;
         readonly HashSet<StopZone> graded = new HashSet<StopZone>();
+        float lastSpeed;
 
         void Awake()
         {
@@ -58,10 +61,15 @@ namespace FarePlay
 
             GradeNewStops();
 
-            if (bus.IsBraking)
+            // Regenerative braking: every m/s you brake away becomes boost, more when the bus is heavier.
+            float speed = Mathf.Abs(bus.CurrentSpeed);
+            float shed = lastSpeed - speed;
+            lastSpeed = speed;
+            Regenerating = bus.IsBraking && shed > 0f;
+            if (Regenerating)
             {
                 float heavier = 1f + tuning.regenBonusPerPassenger * bus.PassengersAboard;
-                Seconds += tuning.regenBoostPerBrakeSecond * heavier * Time.deltaTime;
+                Seconds += tuning.regenBoostPerSpeedLost * heavier * shed;
             }
 
             bool wantsBoost = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
