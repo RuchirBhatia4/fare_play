@@ -57,6 +57,15 @@ namespace FarePlay
             if (timer == null) timer = GetComponentInParent<RaceTimer>();
             if (score == null) score = GetComponentInParent<ScoreManager>();
 
+            // The boost label sits inside a small bar: one line only, shrinking to fit if needed.
+            if (boostText != null)
+            {
+                boostText.textWrappingMode = TextWrappingModes.NoWrap;
+                boostText.enableAutoSizing = true;
+                boostText.fontSizeMin = 8f;
+                boostText.fontSizeMax = Mathf.Max(boostText.fontSize, 8f);
+            }
+
             // Shown on the left and right of the top-down overview, where the screen is empty.
             if (rulesPanel == null)    rulesPanel    = CreateSidePanel("RulesPanel", left: true, 560f, RulesText);
             if (controlsPanel == null) controlsPanel = CreateSidePanel("ControlsPanel", left: false, 470f, ControlsText);
@@ -178,9 +187,9 @@ namespace FarePlay
 
             if (boostText != null)
                 boostText.text = boosting ? "BOOSTING"
-                               : boost != null && boost.Regenerating ? "REGEN +"
-                               : fill >= 0.99f ? "BOOST READY"
-                               : fill > 0f ? "BOOST (Shift)" : "BOOST";
+                               : boost != null && boost.Regenerating ? "REGEN"
+                               : fill >= 0.99f ? "READY"
+                               : "BOOST";
 
             if (loadText != null)
             {
