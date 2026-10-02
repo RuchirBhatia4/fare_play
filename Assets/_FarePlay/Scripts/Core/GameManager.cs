@@ -9,7 +9,7 @@ namespace FarePlay
     ///
     ///   Overview --(30 s or Space)--> Ready --(start line)--> Driving --(finish line)--> Won
     ///                                                                 --(timer hits 0)--> Failed
-    ///   Won / Failed --(R)--> restart the scene
+    ///   Won / Failed --(P)--> play again;  any time before that --(R)--> start over
     /// </summary>
     public class GameManager : MonoBehaviour
     {
@@ -23,7 +23,10 @@ namespace FarePlay
  
         [Header("Keys")]
         [SerializeField] KeyCode skipOverviewKey = KeyCode.Space;
+        [Tooltip("Start over at any time during a run.")]
         [SerializeField] KeyCode restartKey = KeyCode.R;
+        [Tooltip("Play again from the results screen.")]
+        [SerializeField] KeyCode playAgainKey = KeyCode.P;
  
         public GameTuning Tuning => tuning;
         public GameState State { get; private set; } = GameState.Overview;
@@ -51,6 +54,14 @@ namespace FarePlay
  
         void Update()
         {
+            // R: start over at any time while playing (overview, ready or driving).
+            bool playing = State != GameState.Won && State != GameState.Failed;
+            if (playing && Input.GetKeyDown(restartKey))
+            {
+                Restart();
+                return;
+            }
+
             switch (State)
             {
                 case GameState.Overview:
@@ -64,8 +75,8 @@ namespace FarePlay
  
                 case GameState.Won:
                 case GameState.Failed:
-                    // Not while the player is typing their name (the name might contain an R).
-                    if (Input.GetKeyDown(restartKey) && !ResultsScreen.EnteringName) Restart();
+                    // P: play again. Not while the player is typing their name (it might contain a P).
+                    if (Input.GetKeyDown(playAgainKey) && !ResultsScreen.EnteringName) Restart();
                     break;
             }
         }

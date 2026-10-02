@@ -135,7 +135,7 @@ namespace FarePlay
             {
                 case GameState.Overview:
                     return $"Driving starts in {Mathf.CeilToInt(gm.OverviewSecondsLeft)}s\n" +
-                           "<size=55%>Space: skip  |  Arrows: drive  |  Shift: boost  |  C: top view</size>";
+                           "<size=55%>Space: skip  |  Arrows: drive  |  Shift: boost  |  C: top view  |  R: restart</size>";
                 case GameState.Ready:
                     return "<size=55%>Drive through a start line to begin</size>";
                 case GameState.Won:

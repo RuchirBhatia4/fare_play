@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace FarePlay
 {
@@ -22,7 +23,7 @@ namespace FarePlay
         const string Muted = "#9AA0A6";
         const string Gold  = "#FFD54A";
 
-        /// <summary>True while the player is typing their name. GameManager holds off on R-to-restart.</summary>
+        /// <summary>True while the player is typing their name. GameManager holds off on P-to-play-again.</summary>
         public static bool EnteringName { get; private set; }
 
         string routeName;
@@ -31,7 +32,17 @@ namespace FarePlay
 
         void Awake()
         {
-            if (panel != null) panel.SetActive(false);
+            if (panel == null) return;
+            panel.SetActive(false);
+
+            // Wire the panel's button to play again, and label it with the key.
+            Button button = panel.GetComponentInChildren<Button>(true);
+            if (button != null)
+            {
+                button.onClick.AddListener(() => { if (GameManager.Instance != null) GameManager.Instance.Restart(); });
+                TMP_Text label = button.GetComponentInChildren<TMP_Text>(true);
+                if (label != null) label.text = "Press P to play again";
+            }
         }
 
         void OnEnable()  { GameEvents.RunEnded += Show; }
