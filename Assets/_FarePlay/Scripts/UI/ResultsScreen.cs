@@ -22,21 +22,58 @@ namespace FarePlay
         const string Muted = "#9AA0A6";
         const string Gold  = "#FFD54A";
 
+        /// <summary>True while the player is typing their name. GameManager holds off on R-to-restart.</summary>
+        public static bool EnteringName { get; private set; }
+
+        string routeName;
+        int newRank = -1;
+        string typedName = "";
+
         void Awake()
         {
             if (panel != null) panel.SetActive(false);
         }
 
         void OnEnable()  { GameEvents.RunEnded += Show; }
-        void OnDisable() { GameEvents.RunEnded -= Show; }
+        void OnDisable() { GameEvents.RunEnded -= Show; EnteringName = false; }
+
+        void Update()
+        {
+            if (!EnteringName) return;
+
+            bool changed = false;
+            foreach (char c in Input.inputString)
+            {
+                if (c == '\b')
+                {
+                    if (typedName.Length > 0) typedName = typedName.Substring(0, typedName.Length - 1);
+                }
+                else if (c == '\n' || c == '\r')
+                {
+                    EnteringName = false;
+                    BestScores.SetName(routeName, newRank, typedName);
+                }
+                else if ((char.IsLetterOrDigit(c) || c == ' ') && typedName.Length < BestScores.MaxNameLength)
+                {
+                    typedName += char.ToUpperInvariant(c);
+                }
+                changed = true;
+            }
+
+            // Redraw while typing (the cursor blinks).
+            if (changed || EnteringName) ShowBestScores(routeName, newRank, true);
+        }
 
         void Show(RunResult result)
         {
             if (panel != null) panel.SetActive(true);
 
-            // Save completed runs to this browser's best scores, then show the list.
-            int rank = result.Won ? BestScores.Record(result.RouteName, result) : -1;
-            ShowBestScores(result.RouteName, rank, result.Won);
+            // Save completed runs to this browser's best scores, then ask for a name if it made the list.
+            routeName = result.RouteName;
+            newRank = result.Won ? BestScores.Record(routeName, result) : -1;
+            typedName = BestScores.LastName.ToUpperInvariant();
+            EnteringName = newRank >= 0 && bestScoresText != null;
+            ShowBestScores(routeName, newRank, result.Won);
 
             if (titleText != null)
                 titleText.text = result.Won
@@ -83,11 +120,16 @@ namespace FarePlay
             for (int i = 0; i < entries.Count; i++)
             {
                 BestScores.Entry e = entries[i];
-                string line = $"{i + 1}.  {e.score:N2}<pos=50%><size=85%>{e.secondsLeft:0.000} s  ·  {e.passengers} pax</size>";
-                text += (i == rank ? $"<color={Gold}>{line}  <size=70%>NEW</size></color>" : line) + "\n";
+                bool typingHere = i == rank && EnteringName;
+                string cursor = Mathf.Repeat(Time.unscaledTime, 1f) < 0.5f ? "_" : " ";
+                string name = typingHere ? typedName + cursor : e.name;
+                string line = $"{i + 1}. {name}<pos=46%>{e.score:N2}<pos=76%><size=80%>{e.secondsLeft:0.000}s</size>";
+                text += (i == rank ? $"<color={Gold}>{line}</color>" : line) + "\n";
             }
 
-            if (won && rank < 0)
+            if (EnteringName)
+                text += $"\n<color={Gold}><size=80%>Type your name, press Enter to save</size></color>";
+            else if (won && rank < 0)
                 text += $"\n<size=75%><color={Muted}>Not in your top {BestScores.MaxEntries} this time</color></size>";
 
             bestScoresText.text = text;

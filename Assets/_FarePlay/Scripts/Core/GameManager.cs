@@ -64,7 +64,8 @@ namespace FarePlay
  
                 case GameState.Won:
                 case GameState.Failed:
-                    if (Input.GetKeyDown(restartKey)) Restart();
+                    // Not while the player is typing their name (the name might contain an R).
+                    if (Input.GetKeyDown(restartKey) && !ResultsScreen.EnteringName) Restart();
                     break;
             }
         }
