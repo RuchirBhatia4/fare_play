@@ -15,12 +15,12 @@ MonoBehaviour:
   pointsPerPassenger: 100
   timeBonusPerSecond: 10
   redLightPenalty: 50
-  collisionPenalty: 25
+  collisionPenalty: 50
   collisionCooldownSeconds: 1
   overviewSeconds: 30
-  stoppedSpeedThreshold: 0.5
+  stoppedSpeedThreshold: 0.3
   secondsPerPassenger: 1.5
   busCapacity: 0
   fuelTankSize: 100
-  fuelPerSecondAtFullThrottle: 4
-  refuelPerSecond: 25
+  fuelPerSecondAtFullThrottle: 2.5
+  refuelPerSecond: 15

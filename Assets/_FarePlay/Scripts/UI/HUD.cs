@@ -59,7 +59,16 @@ namespace FarePlay
             if (messageText != null)                     messageText.text = MessageFor(gm);
  
             UpdateSignal(gm);
-            // Fuel bar (stretch): fuelFill.fillAmount = fuel / tank size.
+            UpdateFuel();
+        }
+
+        void UpdateFuel()
+        {
+            if (fuelFill == null) return;
+            BusFuel fuel = BusFuel.Current;
+            float amount = fuel != null ? fuel.Fuel01 : 1f;
+            fuelFill.fillAmount = amount;
+            fuelFill.color = amount > 0.5f ? Color.green : amount > 0.2f ? Color.yellow : Color.red;
         }
  
         static string MessageFor(GameManager gm)
